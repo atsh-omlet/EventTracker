@@ -1,11 +1,13 @@
 package com.cs360.eventtrackeratsushi.respository;
 import android.content.Context;
 import com.cs360.eventtrackeratsushi.database.DatabaseHelper;
+import com.cs360.eventtrackeratsushi.util.SecurityUtils;
 import com.cs360.eventtrackeratsushi.util.SessionManager;
 
 public class UserRepository {
     private final DatabaseHelper dbHelper;
     private final SessionManager sessionManager;
+
 
     public UserRepository(Context context){
         dbHelper = new DatabaseHelper(context);
@@ -33,7 +35,8 @@ public class UserRepository {
     }
 
     public boolean login(String username, String password){
-        if (checkUser(username, password)){
+        String hashedPassword = SecurityUtils.hashPassword(password);
+        if (checkUser(username, hashedPassword)){
             int userId = dbHelper.getUserId(username);
             sessionManager.saveLoginSession(userId, username);
             return true;
@@ -47,7 +50,8 @@ public class UserRepository {
 
     public boolean createUser(String username, String password, String passwordConfirm){
         if (password.equals(passwordConfirm)){
-            dbHelper.createUser(username, password);
+            String hashedPassword = SecurityUtils.hashPassword(password);
+            dbHelper.createUser(username, hashedPassword);
             int userId = dbHelper.getUserId(username);
             sessionManager.saveLoginSession(userId, username);
             return true;

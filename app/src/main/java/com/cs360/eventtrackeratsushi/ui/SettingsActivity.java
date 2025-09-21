@@ -164,6 +164,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
 
+
         @Override
         public void onRequestPermissionsResult(int requestCode,
                                                @NonNull String[] permissions,

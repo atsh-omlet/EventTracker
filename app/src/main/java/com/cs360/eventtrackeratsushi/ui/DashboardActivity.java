@@ -15,11 +15,9 @@ import androidx.work.WorkManager;
 
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.R;
-import com.cs360.eventtrackeratsushi.SmsWorker;
 import com.cs360.eventtrackeratsushi.adapter.EventAdapter;
 import com.cs360.eventtrackeratsushi.database.DatabaseHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -113,7 +111,7 @@ public class DashboardActivity extends AppCompatActivity
 
         // schedule reminders for each event
         for (Event event : events) {
-            scheduleSmsWithWorkManager(event, phoneNumber);
+            //scheduleSmsWithWorkManager(event, phoneNumber);
         }
         if(eventAdapter != null) { // notify adapter of changes
             eventAdapter.notifyDataSetChanged();
@@ -143,11 +141,13 @@ public class DashboardActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+    /*
     /**
      * Schedules an Sms reminder using WorkManager if enabled in settings
      * @param event event to schedule reminder for
      * @param phoneNumber phone number to send sms to
      */
+    /*
     private void scheduleSmsWithWorkManager(Event event, String phoneNumber) {
         SharedPreferences settingsPrefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
         boolean smsEnabled = settingsPrefs.getBoolean("enable_sms_notifications", false);
@@ -169,7 +169,7 @@ public class DashboardActivity extends AppCompatActivity
                     .build();
 
             // create and queue the WorkManger task
-            OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(SmsWorker.class)
+            OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(NotificationWorker.class)
                     .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                     .setInputData(data)
                     .build();
@@ -180,6 +180,8 @@ public class DashboardActivity extends AppCompatActivity
             // silently fail if something goes wrong
         }
     }
+
+    */
 
 
 }

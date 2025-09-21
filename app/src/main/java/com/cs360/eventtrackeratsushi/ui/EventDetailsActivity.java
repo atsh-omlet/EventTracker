@@ -65,7 +65,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     }
 
     /**
-     * load event deatils from database
+     * load event details from database
      * */
     private void loadEventData() {
         Event event = dbHelper.getEvent(eventId);
