@@ -1,4 +1,4 @@
-package com.cs360.eventtrackeratsushi;
+package com.cs360.eventtrackeratsushi.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import com.cs360.eventtrackeratsushi.model.Event;
 
 import java.util.ArrayList;
 
@@ -47,7 +49,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param db
      */
     @Override
-    public void onCreate(SQLiteDatabase db) {
+     public void onCreate(SQLiteDatabase db) {
         String CREATE_USER_TABLE = "create table " + UserTable.TABLE + " (" +
                 UserTable.COL_ID + " integer primary key autoincrement, " +
                 UserTable.COL_USERNAME + " text unique, " + UserTable.COL_PASSWORD +
@@ -113,7 +115,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param password
      * @return true if successful, false if not
      */
-    public boolean addUser(String username, String password) {
+    public boolean createUser(String username, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(UserTable.COL_USERNAME, username);
@@ -123,31 +125,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result != -1;
     }
 
-    /**
-     *  updates user's phonenumber by id. unused.
-     * @param userId
-     * @param phoneNumber
-     * @return true if successful, false if not
-     */
-    public boolean updatePhoneNumber(int userId, String phoneNumber) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(UserTable.COL_PHONE, phoneNumber);
-
-        int rowsAffected = db.update(
-                UserTable.TABLE,
-                values,
-                UserTable.COL_ID + "=?",
-                new String[]{String.valueOf(userId)}
-        );
-        db.close();
-        return rowsAffected > 0;
-    }
 
     /**
      * returns user id by username
      * @param username
-     * @return usr id if found, -1 if not
+     * @return usrId if found, -1 if not
      */
     public int getUserId(String username){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -172,7 +154,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param userId userid
      * @return true if succesful, false if not
      */
-    public boolean addEvent(String title, String date, int userId) {
+    public boolean createEvent(String title, String date, int userId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(EventTable.COL_EVENT_TITLE, title);

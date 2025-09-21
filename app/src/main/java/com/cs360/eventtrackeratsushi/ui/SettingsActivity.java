@@ -1,4 +1,4 @@
-package com.cs360.eventtrackeratsushi;
+package com.cs360.eventtrackeratsushi.ui;
 
 import android.Manifest;
 import android.content.Context;
@@ -14,10 +14,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
+
+import com.cs360.eventtrackeratsushi.R;
+import com.cs360.eventtrackeratsushi.viewmodel.LoginViewModel;
 
 /**
  * Activity for manging application settings:
@@ -53,10 +57,11 @@ public class SettingsActivity extends AppCompatActivity {
         private SwitchPreferenceCompat smsPreference;
         private EditTextPreference phoneNumberPreference;
         private final int SMS_PERMISSION_CODE = 0; // Request code for SMS permission
-
+        private LoginViewModel loginViewModel;
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
+            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
 
             // Logout preference
             Preference logoutPreference = findPreference("logout");
@@ -101,11 +106,7 @@ public class SettingsActivity extends AppCompatActivity {
             // handle log out button
             if (preference.getKey().equals("logout")) {
                 // clear login credentials
-                requireActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
-                        .edit()
-                        .clear()
-                        .apply();
-                // return to login screen & clear back stack
+                loginViewModel.logout();
                 Intent intent = new Intent(requireContext(), MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);

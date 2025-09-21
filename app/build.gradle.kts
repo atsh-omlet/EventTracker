@@ -44,4 +44,6 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation (libs.material)
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.9.4")
 }

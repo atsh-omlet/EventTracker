@@ -1,4 +1,4 @@
-package com.cs360.eventtrackeratsushi;
+package com.cs360.eventtrackeratsushi.ui;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -8,12 +8,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import com.cs360.eventtrackeratsushi.model.Event;
+import com.cs360.eventtrackeratsushi.R;
+import com.cs360.eventtrackeratsushi.database.DatabaseHelper;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -130,7 +130,7 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         if (eventId == -1) {
             // create new event
-            boolean result = dbHelper.addEvent(eventName, eventDate, userId);
+            boolean result = dbHelper.createEvent(eventName, eventDate, userId);
             if (result) {
                 Toast.makeText(this, "Event created", Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);

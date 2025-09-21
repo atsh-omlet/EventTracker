@@ -1,4 +1,4 @@
-package com.cs360.eventtrackeratsushi;
+package com.cs360.eventtrackeratsushi.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

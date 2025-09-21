@@ -1,14 +1,16 @@
-package com.cs360.eventtrackeratsushi;
+package com.cs360.eventtrackeratsushi.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.cs360.eventtrackeratsushi.model.Event;
+import com.cs360.eventtrackeratsushi.R;
 
 import java.util.List;
 

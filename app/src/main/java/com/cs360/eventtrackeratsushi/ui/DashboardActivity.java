@@ -1,27 +1,27 @@
-package com.cs360.eventtrackeratsushi;
+package com.cs360.eventtrackeratsushi.ui;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
-import android.telephony.SmsManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.cs360.eventtrackeratsushi.model.Event;
+import com.cs360.eventtrackeratsushi.R;
+import com.cs360.eventtrackeratsushi.SmsWorker;
+import com.cs360.eventtrackeratsushi.adapter.EventAdapter;
+import com.cs360.eventtrackeratsushi.database.DatabaseHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
@@ -175,9 +175,7 @@ public class DashboardActivity extends AppCompatActivity
                     .build();
 
             WorkManager.getInstance(this).enqueue(workRequest);
-            //show a local toast
-            Toast.makeText(this, "Reminder: " + event.getTitle() + " is starting now!"
-                    , Toast.LENGTH_SHORT).show();
+
         } catch (Exception e) {
             // silently fail if something goes wrong
         }
