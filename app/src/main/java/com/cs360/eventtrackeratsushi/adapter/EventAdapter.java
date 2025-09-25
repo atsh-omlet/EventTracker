@@ -23,7 +23,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     private OnItemLongClickListener longClickListener;
 
     /**
-     * interface for callback when event's delete ubutton is pressed
+     * interface for callback when event's delete button is pressed
      */
     public interface OnDeleteClickListener {
         void onDeleteClick(Event event);
@@ -38,16 +38,18 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     /**
      *  Constructor for EventAdapter
-     * @param events
      * @param deleteListener
      * @param longClickListener
      */
-    public EventAdapter(List<Event> events,
-                        OnDeleteClickListener deleteListener,
+    public EventAdapter(OnDeleteClickListener deleteListener,
                         OnItemLongClickListener longClickListener) {
-        this.events = events;
         this.deleteListener = deleteListener;
         this.longClickListener = longClickListener;
+    }
+
+    public void setEvents(List<Event> events){
+        this.events = events;
+        notifyDataSetChanged();
     }
 
     /**

@@ -2,41 +2,47 @@ package com.cs360.eventtrackeratsushi.respository;
 import android.content.Context;
 import com.cs360.eventtrackeratsushi.database.DatabaseHelper;
 import com.cs360.eventtrackeratsushi.model.Event;
+import com.cs360.eventtrackeratsushi.util.SessionManager;
 
 import java.util.ArrayList;
 
 public class EventRepository {
     private final DatabaseHelper dbHelper;
+    private final SessionManager sessionManager;
+    private final int userId;
 
     public EventRepository(Context context){
         dbHelper = new DatabaseHelper(context);
+        sessionManager = new SessionManager(context);
+        userId = sessionManager.getUserId();
     }
+
+    public String getUsername(){
+        return sessionManager.getUsername();
+    }
+
 
     /**
      *  add new event to databae
      * @param title event title
      * @param date event date
-     * @param userId userid
      * @return true if succesful, false if not
      */
-    public boolean createEvent(String title, String date, int userId) {
+    public boolean createEvent(String title, String date) {
         return dbHelper.createEvent(title, date, userId);
     }
 
     /**
-     *
-     * @param id
-     * @return returns event by id
+     * @return returns event
      */
-    public Event getEvent(int id) {
-        return dbHelper.getEvent(id);
+    public Event getEvent(int eventId) {
+        return dbHelper.getEvent(eventId);
     }
 
     /**
      * updates existing event
      * @param eventId
      * @param newTitle
-     * @param newDate
      * @return true if successful, false if not
      */
     public boolean updateEvent(int eventId, String newTitle, String newDate) {
@@ -53,10 +59,9 @@ public class EventRepository {
     }
 
     /**
-     * @param userId
      * @return all events associated with a userId, ordered by ascending datae
      */
-    public ArrayList<Event> getEventsForUser(int userId) {
+    public ArrayList<Event> getEventsForUser() {
         return dbHelper.getEventsForUser(userId);
     }
 

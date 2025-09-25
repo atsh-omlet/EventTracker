@@ -53,34 +53,7 @@ public class CreateLoginActivity extends AppCompatActivity{
             String password = etPassword.getText().toString().trim();
             String passwordConfirm = etConfirmPassword.getText().toString().trim();
             loginViewModel.createUser(username, password, passwordConfirm);
-            /*
-            if (username.isEmpty() || password.isEmpty() || passwordConfirm.isEmpty()){
-                Toast.makeText(CreateLoginActivity.this, "Please enter both username " +
-                        "and password", Toast.LENGTH_SHORT).show();
-            }
-            else if (dbHelper.checkUsernameExists(username)){
-                Toast.makeText(CreateLoginActivity.this, "Username taken, " +
-                        "please login.", Toast.LENGTH_SHORT).show();
-            }
-            else if (password.equals(passwordConfirm)){
-                dbHelper.createUser(username, password);
-                int userId = dbHelper.getUserId(username);
-                getSharedPreferences("LoginPrefs", MODE_PRIVATE)
-                        .edit()
-                        .putBoolean("isLoggedIn", true)
-                        .putString("username", username)
-                        .putInt("userId",userId)
-                        .apply();
-                Intent intent = new Intent(CreateLoginActivity.this, DashboardActivity.class);
-                startActivity(intent);
-                finish();
-            }
-            else {
-                Toast.makeText(CreateLoginActivity.this, "Passwords do not match. " +
-                        "Please try again.", Toast.LENGTH_SHORT).show();
-            }
 
-             */
         });
     }
 }

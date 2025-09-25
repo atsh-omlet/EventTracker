@@ -2,7 +2,6 @@ package com.cs360.eventtrackeratsushi.ui;
 
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.cs360.eventtrackeratsushi.R;
-import com.cs360.eventtrackeratsushi.database.DatabaseHelper;
 import com.cs360.eventtrackeratsushi.viewmodel.LoginViewModel;
 
 /**
