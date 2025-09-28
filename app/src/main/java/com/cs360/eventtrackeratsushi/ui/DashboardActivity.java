@@ -3,6 +3,8 @@ package com.cs360.eventtrackeratsushi.ui;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -90,6 +92,28 @@ public class DashboardActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.event_menu, menu);
+
+
+        MenuItem searchItem = menu.findItem(R.id.search);
+
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        searchView.setQueryHint("Search events...");
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                eventAdapter.searchEvent(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                eventAdapter.searchEvent(newText);
+                return true;
+            }
+        });
+
+
         return true;
     }
 

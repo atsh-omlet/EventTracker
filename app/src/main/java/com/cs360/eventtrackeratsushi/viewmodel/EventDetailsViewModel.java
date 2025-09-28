@@ -9,7 +9,6 @@ import androidx.lifecycle.AndroidViewModel;
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.respository.EventRepository;
 
-import java.util.List;
 import java.util.Objects;
 
 

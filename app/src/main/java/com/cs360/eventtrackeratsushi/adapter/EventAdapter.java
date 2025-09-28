@@ -12,13 +12,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Adpater for displaying list of Event objects in a RecyclerView
  */
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
-    private List<Event> events;
+    private List<Event> events = new ArrayList<>();
+    private List<Event> displayedEvents = new ArrayList<>();
     private OnDeleteClickListener deleteListener;
     private OnItemLongClickListener longClickListener;
 
@@ -48,7 +50,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     }
 
     public void setEvents(List<Event> events){
-        this.events = events;
+        this.events.clear();
+        this.events.addAll(events);
+        this.displayedEvents.clear();
+        this.displayedEvents.addAll(events);
         notifyDataSetChanged();
     }
 
@@ -75,7 +80,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
      */
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
-        Event event = events.get(position);
+        Event event = displayedEvents.get(position);
         holder.eventName.setText(event.getTitle());
         holder.eventDate.setText(event.getFormattedDate());
 
@@ -96,13 +101,30 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         });
     }
 
+    public void searchEvent(String text){
+        displayedEvents.clear();
+        List<Event> filteredList = new ArrayList<>();
+        if (text.trim().isEmpty()){
+            displayedEvents.addAll(events);
+        }
+        else {
+            for (Event event : events){
+                if (event.getTitle().toLowerCase().contains(text.toLowerCase())){
+                    filteredList.add(event);
+                }
+            }
+        }
+        displayedEvents.addAll(filteredList);
+        notifyDataSetChanged();
+    }
+
     /**
      *
      * @return total number of events in list
      */
     @Override
     public int getItemCount() {
-        return events.size();
+        return displayedEvents.size();
     }
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {

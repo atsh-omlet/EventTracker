@@ -13,6 +13,7 @@ public class Event {
     private String title;
     private String date;
     private final int userId;
+    private String flag;
 
     /**
      *  Constructor
@@ -26,6 +27,7 @@ public class Event {
         this.title = title;
         this.date = date;
         this.userId = userId;
+        this.flag = "";
     }
 
     public int getId() {
