@@ -21,7 +21,7 @@ public class CreateLoginActivity extends AppCompatActivity{
     private Button btnCreateAccount;
     private EditText etUsername, etPassword, etConfirmPassword;
     private LoginViewModel loginViewModel;
-    DatabaseHelper dbHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +33,7 @@ public class CreateLoginActivity extends AppCompatActivity{
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
 
-        dbHelper = new DatabaseHelper(this);
+
 
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 

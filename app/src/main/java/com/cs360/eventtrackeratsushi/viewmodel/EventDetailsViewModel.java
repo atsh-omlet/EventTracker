@@ -23,7 +23,7 @@ public class EventDetailsViewModel extends AndroidViewModel{
 
     public EventDetailsViewModel(@NonNull Application application) {
         super(application);
-        repository = new EventRepository(application);
+        repository = EventRepository.getInstance(application);
     }
 
     public LiveData<String> getEventName(){

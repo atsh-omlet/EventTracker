@@ -8,9 +8,17 @@ public class UserRepository {
     private final DatabaseHelper dbHelper;
     private final SessionManager sessionManager;
 
+    private static UserRepository instance;
+    public static UserRepository getInstance(Context context){
+        if (instance == null){
+            instance = new UserRepository(context);
+        }
+        return instance;
+    }
 
-    public UserRepository(Context context){
-        dbHelper = new DatabaseHelper(context);
+
+    private UserRepository(Context context){
+        dbHelper = DatabaseHelper.getInstance(context);
         sessionManager = new SessionManager(context);
     }
 

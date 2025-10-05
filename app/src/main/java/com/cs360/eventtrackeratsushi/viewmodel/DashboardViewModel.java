@@ -18,7 +18,7 @@ public class DashboardViewModel extends AndroidViewModel{
 
     public DashboardViewModel(@NonNull Application application) {
         super(application);
-        repository = new EventRepository(application);
+        repository = EventRepository.getInstance(application);
         username.setValue(repository.getUsername());
         loadEvents();
     }

@@ -11,8 +11,16 @@ public class EventRepository {
     private final SessionManager sessionManager;
     private final int userId;
 
-    public EventRepository(Context context){
-        dbHelper = new DatabaseHelper(context);
+    private static EventRepository instance;
+    public static EventRepository getInstance(Context context){
+        if (instance == null){
+            instance = new EventRepository(context);
+        }
+        return instance;
+    }
+
+    private EventRepository(Context context){
+        dbHelper = DatabaseHelper.getInstance(context);
         sessionManager = new SessionManager(context);
         userId = sessionManager.getUserId();
     }

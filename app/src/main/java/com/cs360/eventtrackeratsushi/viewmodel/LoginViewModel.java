@@ -17,7 +17,7 @@ public class LoginViewModel extends AndroidViewModel {
 
     public LoginViewModel(@NonNull Application application){
         super(application);
-        repository = new UserRepository(application);
+        repository = UserRepository.getInstance(application);
         isLoggedIn.setValue(repository.isLoggedIn());
     }
 
