@@ -104,12 +104,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public void searchEvent(String text){
         displayedEvents.clear();
         List<Event> filteredList = new ArrayList<>();
-        if (text.trim().isEmpty()){
+        if (text.trim().isEmpty()||text.length()<2){
             displayedEvents.addAll(events);
         }
         else {
+            String query = text.toLowerCase();
             for (Event event : events){
-                if (event.getTitle().toLowerCase().contains(text.toLowerCase())){
+                if (event.getTitle().toLowerCase().contains(query)){
                     filteredList.add(event);
                 }
             }

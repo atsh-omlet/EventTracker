@@ -24,7 +24,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         private static final String COL_ID = "_id";
         private static final String COL_USERNAME = "username";
         private static final String COL_PASSWORD = "password";
-        private static final String COL_PHONE = "phone_number";
     }
 
     // Event database
