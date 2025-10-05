@@ -14,6 +14,9 @@ class DatabaseHelper private constructor(context: Context) {
 
     private val realm: Realm
 
+    /**
+     * Singleton instance of the DatabaseHelper class.
+     */
     companion object{
         @Volatile
         private var instance: DatabaseHelper? = null
@@ -29,7 +32,7 @@ class DatabaseHelper private constructor(context: Context) {
         val config = RealmConfiguration.Builder(
             schema = setOf(Event::class, User::class)
         )
-            .name("event_tracker_FIXED.realm")  // ← NEW NAME
+            .name("event_tracker_FIXED.realm")
             .schemaVersion(1)
             .deleteRealmIfMigrationNeeded()
             .build()
@@ -43,7 +46,8 @@ class DatabaseHelper private constructor(context: Context) {
 
     fun createUser(username: String, password: String): Boolean {
         if (checkUsernameExists(username)) return false
-        val nextId = realm.query(User::class).find().size + 1
+        val maxIdValue: Int? = realm.query(Event::class).max("id", Int::class).find()
+        val nextId = (maxIdValue ?: 0) + 1
         realm.writeBlocking {
             copyToRealm(User(nextId, username, password))
         }
@@ -69,7 +73,8 @@ class DatabaseHelper private constructor(context: Context) {
     // ----------------------------
 
     fun createEvent(title: String, date: String, userId: Int): Boolean {
-        val nextId = realm.query(Event::class).find().size + 1
+        val maxIdValue: Int? = realm.query(Event::class).max("id", Int::class).find()
+        val nextId = (maxIdValue ?: 0) + 1
         realm.writeBlocking {
             copyToRealm(Event(nextId, title, date, userId))
         }

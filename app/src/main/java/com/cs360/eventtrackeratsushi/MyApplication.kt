@@ -16,4 +16,9 @@ class MyApplication : Application() {
 
         realm = Realm.open(config)
     }
+
+    override fun onTerminate() {
+        super.onTerminate()
+        realm.close()
+    }
 }
