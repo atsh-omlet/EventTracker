@@ -12,7 +12,7 @@ preference = "1.2.0"
 recyclerview = "1.4.0"
 workRuntime = "2.10.2"
 realm = "1.16.0"
-kotlin = "2.2.0"
+kotlin = "1.9.23"
 coreKtx = "1.17.0"
 
 [libraries]

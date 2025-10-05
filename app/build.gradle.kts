@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.cs360.eventtrackeratsushi"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.cs360.eventtrackingappatsushi"
