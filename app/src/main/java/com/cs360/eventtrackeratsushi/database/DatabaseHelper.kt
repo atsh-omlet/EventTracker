@@ -1,14 +1,12 @@
 package com.cs360.eventtrackeratsushi.database
 
 import android.content.Context
-import android.util.Log
 import com.cs360.eventtrackeratsushi.model.Event
 import com.cs360.eventtrackeratsushi.model.User
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
-import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.Sort
-import java.io.File
+
 
 class DatabaseHelper private constructor(context: Context) {
 
@@ -40,13 +38,13 @@ class DatabaseHelper private constructor(context: Context) {
         realm = Realm.open(config)
     }
 
-    // ----------------------------
+    // --------------------------
     //  USER METHODS
-    // ----------------------------
-
+    // --------------------------
     fun createUser(username: String, password: String): Boolean {
         if (checkUsernameExists(username)) return false
         val maxIdValue: Int? = realm.query(Event::class).max("id", Int::class).find()
+
         val nextId = (maxIdValue ?: 0) + 1
         realm.writeBlocking {
             copyToRealm(User(nextId, username, password))
@@ -58,9 +56,11 @@ class DatabaseHelper private constructor(context: Context) {
         return realm.query(User::class, "username == $0", username).find().isNotEmpty()
     }
 
+
     fun checkUser(username: String, password: String): Boolean {
         return realm.query(User::class, "username == $0 AND password == $1", username, password)
             .find().isNotEmpty()
+
     }
 
     fun getUserId(username: String): Int {
@@ -68,10 +68,9 @@ class DatabaseHelper private constructor(context: Context) {
         return user?.id ?: -1
     }
 
-    // ----------------------------
+    // --------------------------
     //  EVENT METHODS
-    // ----------------------------
-
+    // --------------------------
     fun createEvent(title: String, date: String, userId: Int): Boolean {
         val maxIdValue: Int? = realm.query(Event::class).max("id", Int::class).find()
         val nextId = (maxIdValue ?: 0) + 1
@@ -81,10 +80,12 @@ class DatabaseHelper private constructor(context: Context) {
         return true
     }
 
+
     fun getEvent(id: Int): Event? {
         val e = realm.query(Event::class, "id == $0", id).find().firstOrNull()
         return e?.let { Event(it.id, it.title, it.date, it.userId) }
     }
+
 
     fun updateEvent(eventId: Int, newTitle: String, newDate: String): Boolean {
         realm.writeBlocking {
@@ -97,13 +98,16 @@ class DatabaseHelper private constructor(context: Context) {
         return true
     }
 
+
     fun deleteEvent(eventId: Int): Boolean {
         realm.writeBlocking {
             val event = query(Event::class, "id == $0", eventId).find().firstOrNull()
             event?.let { delete(it) }
         }
+
         return true
     }
+
 
     fun getEventsForUser(userId: Int): ArrayList<Event> {
         val results = realm.query(Event::class, "userId == $0", userId)
@@ -115,7 +119,4 @@ class DatabaseHelper private constructor(context: Context) {
         return list
     }
 
-    fun close() {
-        realm.close()
-    }
 }

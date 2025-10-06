@@ -12,7 +12,7 @@ class Event : RealmObject {
     var date: String = ""
     var userId: Int = 0
 
-    constructor() // Realm requires an empty constructor
+    constructor()
 
     constructor(id: Int, title: String, date: String, userId: Int) : this() {
         this.id = id

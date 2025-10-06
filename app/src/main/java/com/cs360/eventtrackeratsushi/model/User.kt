@@ -5,7 +5,7 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 import io.realm.kotlin.types.annotations.Index
 
 class User : RealmObject {
-    constructor() // Realm requires an empty constructor
+    constructor()
     constructor(id: Int, username: String, password: String) {
         this.id = id
         this.username = username
