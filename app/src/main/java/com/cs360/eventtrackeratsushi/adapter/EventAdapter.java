@@ -17,14 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Adpater for displaying list of Event objects in a RecyclerView
+ * Adapter for displaying list of Event objects in a RecyclerView
  */
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
-    private List<Event> events = new ArrayList<>();
-    private List<Event> displayedEvents = new ArrayList<>();
-    private OnDeleteClickListener deleteListener;
-    private OnItemLongClickListener longClickListener;
-    private DateUtils dateUtils = new DateUtils();
+    private final List<Event> events = new ArrayList<>();
+    private final List<Event> displayedEvents = new ArrayList<>();
+    private final OnDeleteClickListener deleteListener;
+    private final OnItemLongClickListener longClickListener;
+    private final DateUtils dateUtils = new DateUtils();
 
     /**
      * interface for callback when event's delete button is pressed
