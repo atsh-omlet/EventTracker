@@ -20,16 +20,4 @@ class Event : RealmObject {
         this.date = date
         this.userId = userId
     }
-
-
-    fun getFormattedDate(): String {
-        return try {
-            val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-            val outputFormat = SimpleDateFormat("MMM dd 'at' h:mm a", Locale.getDefault())
-            val parsedDate = inputFormat.parse(date)
-            outputFormat.format(parsedDate!!)
-        } catch (e: Exception) {
-            date
-        }
-    }
 }

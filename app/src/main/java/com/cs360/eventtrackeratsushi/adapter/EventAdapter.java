@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.R;
+import com.cs360.eventtrackeratsushi.util.DateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     private List<Event> displayedEvents = new ArrayList<>();
     private OnDeleteClickListener deleteListener;
     private OnItemLongClickListener longClickListener;
+    private DateUtils dateUtils = new DateUtils();
 
     /**
      * interface for callback when event's delete button is pressed
@@ -82,7 +84,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         Event event = displayedEvents.get(position);
         holder.eventName.setText(event.getTitle());
-        holder.eventDate.setText(event.getFormattedDate());
+        holder.eventDate.setText(dateUtils.formatDate(event.getDate()));
 
         // Delete button click
         holder.btnDelete.setOnClickListener(v -> {

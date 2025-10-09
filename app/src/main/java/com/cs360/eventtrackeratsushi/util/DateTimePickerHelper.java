@@ -30,7 +30,7 @@ public class DateTimePickerHelper {
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH)
         );
-        datePicker.getDatePicker().setMinDate(System.currentTimeMillis() - 1000); //prevent past dates
+        //datePicker.getDatePicker().setMinDate(System.currentTimeMillis() - 1000); //prevent past dates
         datePicker.show();
     }
 
