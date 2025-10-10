@@ -8,6 +8,8 @@ import androidx.lifecycle.AndroidViewModel;
 
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.respository.EventRepository;
+import com.cs360.eventtrackeratsushi.util.DateUtils;
+import com.cs360.eventtrackeratsushi.util.NotificationHelper;
 
 import java.util.Objects;
 
@@ -18,8 +20,10 @@ public class EventDetailsViewModel extends AndroidViewModel{
     private final MutableLiveData<String> eventDate = new MutableLiveData<>("");
     private final MutableLiveData<Boolean> saveSuccess = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final DateUtils dateUtils = new DateUtils();
 
     private int eventId = -1;
+    private final int THIRTY_MINUTES = 60000 * 30;
 
     public EventDetailsViewModel(@NonNull Application application) {
         super(application);
@@ -64,16 +68,34 @@ public class EventDetailsViewModel extends AndroidViewModel{
             return;
         }
         boolean result;
+        Event event;
         if (eventId == -1){
             result = repository.createEvent(eventName.getValue(), eventDate.getValue());
+            if (result){
+                int newId = repository.getLastEventId();
+                event = repository.getEvent(newId);
+            } else {
+                event = null;
+            }
         }
         else {
             result = repository.updateEvent(eventId, eventName.getValue(), eventDate.getValue());
+            event = repository.getEvent(eventId);
+        }
+
+        if (result && event != null){
+            long notificationTime = dateUtils.parseDateToMillis(event.getDate());
+            if (notificationTime > System.currentTimeMillis()){
+                if (notificationTime - System.currentTimeMillis() > THIRTY_MINUTES) {
+                    notificationTime -= THIRTY_MINUTES;
+                    NotificationHelper.scheduleNotification(getApplication(), event, notificationTime);
+                }
+                else {
+                    NotificationHelper.scheduleNotification(getApplication(), event, System.currentTimeMillis());
+                }
+            }
         }
         saveSuccess.setValue(result);
     }
-
-
-
 
 }

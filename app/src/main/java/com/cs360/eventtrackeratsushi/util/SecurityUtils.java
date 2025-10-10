@@ -1,6 +1,4 @@
 package com.cs360.eventtrackeratsushi.util;
-
-
 import org.mindrot.jbcrypt.BCrypt;
 
 public class SecurityUtils {

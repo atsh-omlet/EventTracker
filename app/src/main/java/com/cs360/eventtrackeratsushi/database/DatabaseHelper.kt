@@ -43,7 +43,7 @@ class DatabaseHelper private constructor(context: Context) {
     // --------------------------
     fun createUser(username: String, password: String): Boolean {
         if (checkUsernameExists(username)) return false
-        val maxIdValue: Int? = realm.query(Event::class).max("id", Int::class).find()
+        val maxIdValue: Int? = realm.query(User::class).max("id", Int::class).find()
 
         val nextId = (maxIdValue ?: 0) + 1
         realm.writeBlocking {
@@ -112,7 +112,13 @@ class DatabaseHelper private constructor(context: Context) {
         return true
     }
 
-
+    fun getLastEventId(): Int {
+        val lastEvent = realm.query(Event::class)
+            .sort("id", Sort.DESCENDING)
+            .first()
+            .find()
+        return lastEvent?.id ?: 0
+    }
     fun getEventsForUser(userId: Int): ArrayList<Event> {
         val results = realm.query(Event::class, "userId == $0", userId)
             .sort("date", Sort.ASCENDING)
@@ -122,5 +128,6 @@ class DatabaseHelper private constructor(context: Context) {
         results.forEach { e -> list.add(Event(e.id, e.title, e.date, e.userId)) }
         return list
     }
+
 
 }

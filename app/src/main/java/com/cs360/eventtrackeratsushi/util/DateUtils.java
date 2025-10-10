@@ -32,4 +32,16 @@ public class DateUtils {
         }
     }
 
+    public long parseDateToMillis(String dateString) {
+        try {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
+                    "yyyy-MM-dd HH:mm", java.util.Locale.getDefault());
+            java.util.Date date = sdf.parse(dateString);
+            assert date != null;
+            return date.getTime();
+        } catch (Exception e) {
+            return System.currentTimeMillis();
+        }
+    }
+
 }

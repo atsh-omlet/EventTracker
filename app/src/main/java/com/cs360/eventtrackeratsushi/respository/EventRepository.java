@@ -47,6 +47,10 @@ public class EventRepository {
         return dbHelper.getEvent(eventId);
     }
 
+    public int getLastEventId(){
+        return dbHelper.getLastEventId();
+    }
+
     /**
      * updates existing event
      * @param eventId

@@ -1,7 +1,10 @@
 package com.cs360.eventtrackeratsushi.ui;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.appcompat.widget.SearchView;
@@ -12,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -67,6 +71,14 @@ public class DashboardActivity extends AppCompatActivity
                 eventAdapter.setEvents(events);
             }
         });
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            if (!am.canScheduleExactAlarms()) {
+                Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                startActivity(intent);
+            }
+        }
 
 
         FloatingActionButton fabAddEvent = findViewById(R.id.fabAddEvent);
