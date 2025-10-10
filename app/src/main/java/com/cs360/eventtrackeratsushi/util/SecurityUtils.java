@@ -2,8 +2,10 @@ package com.cs360.eventtrackeratsushi.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class SecurityUtils {
+    /*
     public static String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -18,4 +20,13 @@ public class SecurityUtils {
             throw new RuntimeException("SHA-256 not supported",e);
         }
     }
+    */
+    public static String hashPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
+    public static boolean checkPassword(String password, String hashedPassword) {
+        return BCrypt.checkpw(password, hashedPassword);
+    }
+
 }

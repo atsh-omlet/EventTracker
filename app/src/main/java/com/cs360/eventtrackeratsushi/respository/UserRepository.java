@@ -23,7 +23,8 @@ public class UserRepository {
     }
 
     public boolean checkUser(String username, String password){
-        return dbHelper.checkUser(username, password);
+        return checkUsername(username) &&
+                SecurityUtils.checkPassword(password, dbHelper.getPasssword(username));
     }
 
     public boolean checkUsername(String username){
@@ -43,8 +44,7 @@ public class UserRepository {
     }
 
     public boolean login(String username, String password){
-        String hashedPassword = SecurityUtils.hashPassword(password);
-        if (checkUser(username, hashedPassword)){
+        if (checkUser(username, password)){
             int userId = dbHelper.getUserId(username);
             sessionManager.saveLoginSession(userId, username);
             return true;

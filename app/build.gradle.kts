@@ -52,4 +52,5 @@ dependencies {
     implementation (libs.lifecycle.viewmodel.ktx)
     implementation (libs.lifecycle.livedata.ktx)
     implementation(libs.realm.library)
+    implementation ("org.mindrot:jbcrypt:0.4")
 }

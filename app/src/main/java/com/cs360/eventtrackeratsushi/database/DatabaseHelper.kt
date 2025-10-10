@@ -63,6 +63,10 @@ class DatabaseHelper private constructor(context: Context) {
 
     }
 
+    fun getPasssword(username: String): String{
+        return realm.query(User::class, "username == $0", username).find().first().password
+    }
+
     fun getUserId(username: String): Int {
         val user = realm.query(User::class, "username == $0", username).find().firstOrNull()
         return user?.id ?: -1
