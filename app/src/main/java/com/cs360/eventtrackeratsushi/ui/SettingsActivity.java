@@ -20,6 +20,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
 
 import com.cs360.eventtrackeratsushi.R;
+import com.cs360.eventtrackeratsushi.viewmodel.DashboardViewModel;
 import com.cs360.eventtrackeratsushi.viewmodel.LoginViewModel;
 
 import java.util.Objects;
@@ -75,6 +76,12 @@ public class SettingsActivity extends AppCompatActivity {
             if (preference.getKey().equals("logout")) {
                 // clear login credentials
                 loginViewModel.logout();
+
+                // Clear the events LiveData
+                DashboardViewModel dashboardViewModel =
+                        new ViewModelProvider(requireActivity()).get(DashboardViewModel.class);
+                dashboardViewModel.clearEvents();
+
                 Intent intent = new Intent(requireContext(), MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);

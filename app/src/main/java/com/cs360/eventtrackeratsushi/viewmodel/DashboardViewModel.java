@@ -9,6 +9,7 @@ import androidx.lifecycle.AndroidViewModel;
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.respository.EventRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DashboardViewModel extends AndroidViewModel{
@@ -38,6 +39,10 @@ public class DashboardViewModel extends AndroidViewModel{
 
     public LiveData<String> getUsername(){
         return username;
+    }
+
+    public void clearEvents(){
+        events.setValue(new ArrayList<>());
     }
 
     public void createEvent(String title, String date){

@@ -32,7 +32,6 @@ class DatabaseHelper private constructor(context: Context) {
         )
             .name("event_tracker_FIXED.realm")
             .schemaVersion(1)
-            .deleteRealmIfMigrationNeeded()
             .build()
 
         realm = Realm.open(config)
