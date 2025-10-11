@@ -1,5 +1,6 @@
 package com.cs360.eventtrackeratsushi.viewmodel;
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -11,10 +12,12 @@ import com.cs360.eventtrackeratsushi.respository.EventRepository;
 import com.cs360.eventtrackeratsushi.util.DateUtils;
 import com.cs360.eventtrackeratsushi.util.NotificationHelper;
 
+import java.util.Date;
 import java.util.Objects;
 
 
 public class EventDetailsViewModel extends AndroidViewModel{
+    private final String TAG = "EventDetailsViewModel";
     private final EventRepository repository;
     private final MutableLiveData<String> eventName = new MutableLiveData<>("");
     private final MutableLiveData<String> eventDate = new MutableLiveData<>("");
@@ -84,18 +87,27 @@ public class EventDetailsViewModel extends AndroidViewModel{
         }
 
         if (result && event != null){
-            long notificationTime = dateUtils.parseDateToMillis(event.getDate());
-            if (notificationTime > System.currentTimeMillis()){
-                if (notificationTime - System.currentTimeMillis() > THIRTY_MINUTES) {
-                    notificationTime -= THIRTY_MINUTES;
-                    NotificationHelper.scheduleNotification(getApplication(), event, notificationTime);
+            long eventTime = dateUtils.parseDateToMillis(event.getDate());
+            long currentTime = System.currentTimeMillis();
+            Log.d(TAG, "Event time: " + new Date(eventTime));
+            Log.d(TAG, "Current time: " + new Date(currentTime));
+
+
+            if (eventTime > currentTime){
+                if (eventTime - currentTime > THIRTY_MINUTES) {
+                    eventTime -= THIRTY_MINUTES;
+                    NotificationHelper.scheduleNotification(getApplication(), event, eventTime);
+                    Log.d(TAG, "Notification scheduled for event: " + event.getTitle() + " at " + new Date(eventTime));
                 }
                 else {
-                    NotificationHelper.scheduleNotification(getApplication(), event, System.currentTimeMillis());
+                    NotificationHelper.scheduleNotification(getApplication(), event, currentTime);
+                    Log.d(TAG, "Notification scheduled for event: " + event.getTitle() + " at  + " + new Date(currentTime));
                 }
             }
         }
         saveSuccess.setValue(result);
     }
+    
+
 
 }

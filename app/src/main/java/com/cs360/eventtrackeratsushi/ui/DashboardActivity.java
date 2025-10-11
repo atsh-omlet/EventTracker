@@ -72,14 +72,6 @@ public class DashboardActivity extends AppCompatActivity
             }
         });
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            if (!am.canScheduleExactAlarms()) {
-                Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
-                startActivity(intent);
-            }
-        }
-
 
         FloatingActionButton fabAddEvent = findViewById(R.id.fabAddEvent);
         fabAddEvent.setOnClickListener(view -> {
@@ -87,6 +79,7 @@ public class DashboardActivity extends AppCompatActivity
             startActivity(intent);
 ;
         });
+
 
     }
 
@@ -109,7 +102,7 @@ public class DashboardActivity extends AppCompatActivity
         MenuItem searchItem = menu.findItem(R.id.search);
 
         SearchView searchView = (SearchView) searchItem.getActionView();
-
+        assert searchView != null;
         searchView.setQueryHint("Search events...");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -124,7 +117,6 @@ public class DashboardActivity extends AppCompatActivity
                 return true;
             }
         });
-
 
         return true;
     }

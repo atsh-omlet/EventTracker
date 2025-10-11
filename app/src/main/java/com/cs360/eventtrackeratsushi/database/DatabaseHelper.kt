@@ -30,7 +30,7 @@ class DatabaseHelper private constructor(context: Context) {
         val config = RealmConfiguration.Builder(
             schema = setOf(Event::class, User::class)
         )
-            .name("event_tracker_FIXED.realm")
+            .name("event_tracker.realm")
             .schemaVersion(1)
             .build()
 

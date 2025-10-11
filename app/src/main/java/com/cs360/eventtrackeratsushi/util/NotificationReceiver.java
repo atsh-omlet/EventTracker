@@ -12,33 +12,58 @@ import androidx.core.app.NotificationCompat;
 
 import com.cs360.eventtrackeratsushi.ui.MainActivity;
 
-
+/**
+ * Broadcast receiver for handling notifications
+ */
 public class NotificationReceiver extends BroadcastReceiver {
+
+    private static final String CHANNEL_ID = "event_channel";
+    private static final String CHANNEL_NAME = "Event Reminders";
+
+    private void createNotificationChannel(Context context) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.setDescription("Notifications for upcoming events");
+            channel.enableLights(true);
+            channel.setLightColor(android.graphics.Color.BLUE);
+
+            NotificationManager manager = context.getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
+        }
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
+        createNotificationChannel(context);
+
         String title = intent.getStringExtra("title");
         String date = intent.getStringExtra("eventDate");
         int eventId = intent.getIntExtra("eventId", -1);
 
+        // Create intent to open app when notification is clicked
         Intent openIntent = new Intent(context, MainActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(context, eventId, openIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         String channelId = "event_channel";
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(channelId, "Event Reminders", NotificationManager.IMPORTANCE_HIGH);
-            manager.createNotificationChannel(channel);
-        }
+
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setContentTitle("Upcoming Event")
                 .setContentText("Your event " + title + " is starting soon at " + date + "!")
                 .setContentIntent(contentIntent)
-                .setAutoCancel(true);
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_ALL);
 
-        manager.notify(eventId, builder.build());
-
+        if (manager != null) {
+            manager.notify(eventId, builder.build());
+        }
     }
 }

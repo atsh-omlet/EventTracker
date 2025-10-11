@@ -9,7 +9,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.cs360.eventtrackingappatsushi"
+        applicationId = "com.cs360.eventtrackeratsushi"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

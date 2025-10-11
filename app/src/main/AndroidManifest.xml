@@ -23,7 +23,9 @@
         <receiver
             android:name=".util.NotificationReceiver"
             android:exported="true"
-            android:enabled="true" />
+            android:enabled="true"
+            android:stopWithTask="false">
+        </receiver>
 
         <activity
             android:name=".ui.EventDetailsActivity"

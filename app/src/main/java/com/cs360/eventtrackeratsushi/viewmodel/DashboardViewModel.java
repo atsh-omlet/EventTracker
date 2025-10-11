@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel;
 
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.respository.EventRepository;
+import com.cs360.eventtrackeratsushi.util.NotificationHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ public class DashboardViewModel extends AndroidViewModel{
 
     public void deleteEvent(Event event){
         repository.deleteEvent(event.getId());
+        NotificationHelper.cancelNotification(getApplication(), event.getId());
         loadEvents();
     }
 
