@@ -2,28 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-    <!--
-    <PreferenceCategory app:title="Notifications">
 
-        <SwitchPreferenceCompat
-            app:key="enable_sms_notifications"
-            app:title="Enable SMS Notifications"
-            app:defaultValue="false"
-            app:summaryOff="SMS notifications are disabled"
-            app:summaryOn="You will receive event reminders via SMS"/>
-
-        <EditTextPreference
-            app:key="phone_number"
-            app:title="Phone Number"
-            app:dialogTitle="Enter your phone number"
-            app:dialogMessage="For SMS notifications"
-            app:summary="Set phone number for SMS reminders"
-            app:defaultValue="" />
-
-
-
-    </PreferenceCategory>
-    -->
 
     <PreferenceCategory app:title="Account">
 
@@ -32,7 +11,27 @@
             app:title="Logout"
             app:summary="Sign out of your account" />
 
+        <Preference
+            app:key="change_password"
+            app:title="Change Password"
+            app:summary="Change your password" />
+
+
     </PreferenceCategory>
+
+    <PreferenceCategory app:title="Danger Zone">
+        <Preference
+            app:key="clear_events"
+            app:title="Clear all events"
+            app:summary="Delete all events from the app" />
+        <Preference
+            app:key="delete_account"
+            app:title="Delete Account"
+            app:summary="Delete your account and all associated data" />
+
+
+    </PreferenceCategory>
+
 
 
 </PreferenceScreen>

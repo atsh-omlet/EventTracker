@@ -32,6 +32,19 @@ public class DateUtils {
         }
     }
 
+    public String formatTime(String date) {
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+            Date parsedDate = inputFormat.parse(date);
+            assert parsedDate != null;
+
+            SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.getDefault());
+            return timeFormat.format(parsedDate);
+        } catch (ParseException e) {
+            return date;
+        }
+    }
+
     public long parseDateToMillis(String dateString) {
         try {
             java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(

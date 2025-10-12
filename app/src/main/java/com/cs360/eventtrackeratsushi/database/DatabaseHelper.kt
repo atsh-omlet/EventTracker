@@ -51,6 +51,18 @@ class DatabaseHelper private constructor(context: Context) {
         return true
     }
 
+    fun updatePassword(userId: Int, newPassword: String): Boolean {
+        return realm.writeBlocking {
+            val user = query(User::class, "id == $0", userId).find().firstOrNull()
+            if (user != null) {
+                user.password = newPassword
+                true
+            } else {
+                false
+            }
+        }
+    }
+
     fun checkUsernameExists(username: String): Boolean {
         return realm.query(User::class, "username == $0", username).find().isNotEmpty()
     }
@@ -69,6 +81,21 @@ class DatabaseHelper private constructor(context: Context) {
     fun getUserId(username: String): Int {
         val user = realm.query(User::class, "username == $0", username).find().firstOrNull()
         return user?.id ?: -1
+    }
+
+    fun deleteUser(userId: Int): Boolean {
+        return realm.writeBlocking {
+            // Delete associated events first
+            val events = query(Event::class, "userId == $0", userId).find()
+            delete(events)
+
+            // Then delete the user
+            val user = query(User::class, "id == $0", userId).find().firstOrNull()
+            val userDeleted = user != null
+            user?.let { delete(it) }
+
+            userDeleted
+        }
     }
 
     // --------------------------
@@ -91,24 +118,38 @@ class DatabaseHelper private constructor(context: Context) {
 
 
     fun updateEvent(eventId: Int, newTitle: String, newDate: String): Boolean {
+        var updated = false
         realm.writeBlocking {
             val event = query(Event::class, "id == $0", eventId).find().firstOrNull()
-            event?.apply {
-                title = newTitle
-                date = newDate
+            if (event != null) {
+                event.title = newTitle
+                event.date = newDate
+                updated = true
             }
         }
-        return true
+        return updated
     }
 
 
     fun deleteEvent(eventId: Int): Boolean {
+        var deleted = false;
         realm.writeBlocking {
             val event = query(Event::class, "id == $0", eventId).find().firstOrNull()
-            event?.let { delete(it) }
+            if (event != null) {
+                delete(event)
+                deleted = true
+            }
         }
+        return deleted
+    }
 
-        return true
+    fun deleteAllEvents(userId: Int): Boolean {
+        return realm.writeBlocking {
+            val events = query(Event::class, "userId == $0", userId)
+            val hadEvents = events.find().isNotEmpty()
+            delete(events)
+            hadEvents
+        }
     }
 
     fun getLastEventId(): Int {

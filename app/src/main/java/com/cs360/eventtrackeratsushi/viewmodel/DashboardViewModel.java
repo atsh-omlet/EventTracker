@@ -39,6 +39,16 @@ public class DashboardViewModel extends AndroidViewModel{
         loadEvents();
     }
 
+    public void deleteAllEvents(){
+        Event[] events = new Event[repository.getEventsForUser().size()];
+        events = repository.getEventsForUser().toArray(events);
+        for (Event event : events){
+            NotificationHelper.cancelNotification(getApplication(), event.getId());
+        }
+        repository.deleteAllEvents();
+        loadEvents();
+    }
+
     public LiveData<String> getUsername(){
         return username;
     }

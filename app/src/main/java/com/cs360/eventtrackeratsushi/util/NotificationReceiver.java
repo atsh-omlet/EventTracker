@@ -56,7 +56,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setContentTitle("Upcoming Event")
-                .setContentText("Your event " + title + " is starting soon at " + date + "!")
+                .setContentText("Your event \"" + title + "\" is starting soon at " + date + "!")
                 .setContentIntent(contentIntent)
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)

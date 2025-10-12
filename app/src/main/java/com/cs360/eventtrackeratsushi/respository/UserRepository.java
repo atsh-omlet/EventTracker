@@ -1,14 +1,28 @@
 package com.cs360.eventtrackeratsushi.respository;
 import android.content.Context;
+import android.util.Log;
+
 import com.cs360.eventtrackeratsushi.database.DatabaseHelper;
 import com.cs360.eventtrackeratsushi.util.SecurityUtils;
 import com.cs360.eventtrackeratsushi.util.SessionManager;
 
+/**
+ * Repository for user operations
+ */
 public class UserRepository {
+    private final String TAG = "UserRepository";
+
+    // Singleton instances
     private final DatabaseHelper dbHelper;
+    private static UserRepository instance;
+    // Session manager
     private final SessionManager sessionManager;
 
-    private static UserRepository instance;
+    /**
+     * Singleton getter
+     * @param context context
+     * @return instance
+     */
     public static UserRepository getInstance(Context context){
         if (instance == null){
             instance = new UserRepository(context);
@@ -17,32 +31,69 @@ public class UserRepository {
     }
 
 
+    /**
+     * Constructor
+     * @param context context
+     */
     private UserRepository(Context context){
         dbHelper = DatabaseHelper.getInstance(context);
-        sessionManager = new SessionManager(context);
+        sessionManager = SessionManager.getInstance(context);
     }
 
+    /**
+     * checks if username and password match
+     * @param username username
+     * @param password password
+     * @return true if successful, false if not
+     */
     public boolean checkUser(String username, String password){
         return checkUsername(username) &&
                 SecurityUtils.checkPassword(password, dbHelper.getPasssword(username));
     }
 
+    public boolean checkPassword(String password){
+        return SecurityUtils.checkPassword(password, dbHelper.getPasssword(getUsername()));
+    }
+
+    /**
+     * checks if username exists
+     * @param username username
+     * @return true if exists, false if not
+     */
     public boolean checkUsername(String username){
         return dbHelper.checkUsernameExists(username);
     }
 
+    /**
+     * gets user id
+     * @return user id
+     */
     public int getUserId(){
         return sessionManager.getUserId();
     }
 
+    /**
+     * gets username
+     * @return username
+     */
     public String getUsername(){
         return sessionManager.getUsername();
     }
 
+    /**
+     * checks if user is logged in
+     * @return true if logged in, false if not
+     */
     public boolean isLoggedIn(){
         return sessionManager.isLoggedIn();
     }
 
+    /**
+     * logs user in
+     * @param username username
+     * @param password password
+     * @return true if successful, false if not
+     */
     public boolean login(String username, String password){
         if (checkUser(username, password)){
             int userId = dbHelper.getUserId(username);
@@ -52,10 +103,20 @@ public class UserRepository {
         return false;
     }
 
+    /**
+     * logs user out
+     */
     public void logout(){
         sessionManager.clearSession();
     }
 
+    /**
+     * creates new user
+     * @param username username
+     * @param password password
+     * @param passwordConfirm password confirmation
+     * @return true if successful, false if not
+     */
     public boolean createUser(String username, String password, String passwordConfirm){
         if (password.equals(passwordConfirm)){
             String hashedPassword = SecurityUtils.hashPassword(password);
@@ -65,6 +126,18 @@ public class UserRepository {
             return true;
         }
         return false;
+    }
+
+    public boolean updatePassword(String newPassword){
+        String hashedPassword = SecurityUtils.hashPassword(newPassword);
+        return dbHelper.updatePassword(getUserId(), hashedPassword);
+    }
+
+    public boolean deleteUser(){
+        boolean deleted = dbHelper.deleteUser(getUserId());
+        //sessionManager.clearSession();
+        Log.d(TAG, "isLoggedIn: " +sessionManager.isLoggedIn());
+        return deleted;
     }
 
 

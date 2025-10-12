@@ -34,7 +34,7 @@ public class NotificationHelper {
         intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
         intent.putExtra("title", event.getTitle());
         intent.putExtra("eventId", event.getId());
-        intent.putExtra("eventDate", dateUtils.formatDate(event.getDate()));
+        intent.putExtra("eventDate", dateUtils.formatTime(event.getDate()));
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
@@ -85,7 +85,10 @@ public class NotificationHelper {
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             alarmManager.cancel(pendingIntent);
             pendingIntent.cancel();
+            Log.d(TAG, "Notification canceled for event ID: " + eventId);
         }
     }
+
+
 
 }

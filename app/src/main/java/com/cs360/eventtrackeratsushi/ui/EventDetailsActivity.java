@@ -13,6 +13,8 @@ import com.cs360.eventtrackeratsushi.R;
 import com.cs360.eventtrackeratsushi.util.DateTimePickerHelper;
 import com.cs360.eventtrackeratsushi.viewmodel.EventDetailsViewModel;
 
+import java.util.Objects;
+
 
 /**
  * Activity for creating a new event or editing an existing event
@@ -44,10 +46,10 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         eventId = getIntent().getIntExtra("event_id", -1);
         if (eventId != -1) { // existing event, set edit event as title
-            getSupportActionBar().setTitle("Edit Event");
+            Objects.requireNonNull(getSupportActionBar()).setTitle("Edit Event");
             eventDetailsViewModel.loadEvent(eventId);
         } else { // new event, set new event as title
-            getSupportActionBar().setTitle("New Event");
+            Objects.requireNonNull(getSupportActionBar()).setTitle("New Event");
         }
 
         // Observe ViewModel fields

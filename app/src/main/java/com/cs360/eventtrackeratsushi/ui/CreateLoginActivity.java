@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.cs360.eventtrackeratsushi.R;
-import com.cs360.eventtrackeratsushi.database.DatabaseHelper;
 import com.cs360.eventtrackeratsushi.viewmodel.LoginViewModel;
 
 /**
@@ -44,7 +43,7 @@ public class CreateLoginActivity extends AppCompatActivity{
 
         });
 
-        loginViewModel.getErrorMessage().observe(this, msg ->
+        loginViewModel.getMessage().observe(this, msg ->
             Toast.makeText(CreateLoginActivity.this, msg, Toast.LENGTH_SHORT).show()
         );
 
@@ -53,7 +52,6 @@ public class CreateLoginActivity extends AppCompatActivity{
             String password = etPassword.getText().toString().trim();
             String passwordConfirm = etConfirmPassword.getText().toString().trim();
             loginViewModel.createUser(username, password, passwordConfirm);
-
         });
     }
 }

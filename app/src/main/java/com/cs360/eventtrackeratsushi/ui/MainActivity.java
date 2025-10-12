@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        loginViewModel.getErrorMessage().observe(this, msg ->
+        loginViewModel.getMessage().observe(this, msg ->
                 Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show()
         );
 
