@@ -1,5 +1,6 @@
 package com.cs360.eventtrackeratsushi.adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +20,12 @@ import java.util.List;
 /**
  * Adapter for displaying list of Event objects in a RecyclerView
  */
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
+public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private final String TAG = "EventAdapter";
+    private final int VIEW_TYPE_HEADER = 0;
+    private final int VIEW_TYPE_EVENT = 1;
     private final List<Event> events = new ArrayList<>();
-    private final List<Event> displayedEvents = new ArrayList<>();
+    private final List<Object> displayedItems = new ArrayList<>();
     private final OnDeleteClickListener deleteListener;
     private final OnItemLongClickListener longClickListener;
     private final DateUtils dateUtils = new DateUtils();
@@ -54,13 +58,30 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public void setEvents(List<Event> events){
         this.events.clear();
         this.events.addAll(events);
-        this.displayedEvents.clear();
-        this.displayedEvents.addAll(events);
+        displayedItems.clear();
+
+        String lastDate = null;
+        for (Event event: events){
+            String eventDate = dateUtils.formatWeekday(event.getDate());
+            if (!eventDate.equals(lastDate)){
+                Log.d(TAG, "eventDate: " + eventDate);
+                Log.d(TAG, "lastDate: " + lastDate);
+                Log.d(TAG, "Adding header for eventDate: " + eventDate);
+                if (dateUtils.isToday(event.getDate())) {
+                    displayedItems.add(eventDate+ " (Today)");
+                } else {
+                    displayedItems.add(eventDate);
+                }
+                lastDate = eventDate;
+            }
+            displayedItems.add(event);
+        }
         notifyDataSetChanged();
     }
 
     /**
-     *  Inflates item layout and creates the ViewHolder
+     * Inflates item layout and creates the ViewHolder
+     *
      * @param parent   The ViewGroup into which the new View will be added after it is bound to
      *                 an adapter position.
      * @param viewType The view type of the new View.
@@ -68,10 +89,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
      */
     @NonNull
     @Override
-    public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_event, parent, false);
-        return new EventViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        if (viewType == VIEW_TYPE_EVENT) {
+            View view = inflater.inflate(R.layout.item_event, parent, false);
+            return new EventViewHolder(view);
+        } else { // viewType == VIEW_TYPE_HEADER
+            View view = inflater.inflate(R.layout.item_date_header, parent, false);
+            return new DateHeaderViewHolder(view);
+        }
     }
 
     /**
@@ -81,26 +107,43 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
      * @param position The position of the item within the adapter's data set.
      */
     @Override
-    public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
-        Event event = displayedEvents.get(position);
-        holder.eventName.setText(event.getTitle());
-        holder.eventDate.setText(dateUtils.formatDate(event.getDate()));
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        int viewType = getItemViewType(position);
+        if (viewType == VIEW_TYPE_EVENT) {
+            Event event = (Event) displayedItems.get(position);
+            EventViewHolder eventHolder = (EventViewHolder) holder;
 
-        // Delete button click
-        holder.btnDelete.setOnClickListener(v -> {
-            if (deleteListener != null) {
-                deleteListener.onDeleteClick(event);
-            }
-        });
+            eventHolder.eventName.setText(event.getTitle());
+            eventHolder.eventDate.setText(dateUtils.formatTime(event.getDate()));
 
-        // Item long click
-        holder.itemView.setOnLongClickListener(v -> {
-            if (longClickListener != null) {
-                longClickListener.onItemLongClick(event);
-                return true;
-            }
-            return false;
-        });
+            // Delete button click
+            eventHolder.btnDelete.setOnClickListener(v -> {
+                if (deleteListener != null) {
+                    deleteListener.onDeleteClick(event);
+                }
+            });
+
+            // Item long click
+            eventHolder.itemView.setOnLongClickListener(v -> {
+                if (longClickListener != null) {
+                    longClickListener.onItemLongClick(event);
+                    return true;
+                }
+                return false;
+            });
+        } else if (viewType == VIEW_TYPE_HEADER) {
+            String date = (String) displayedItems.get(position);
+            DateHeaderViewHolder headerHolder = (DateHeaderViewHolder) holder;
+            headerHolder.dateHeader.setText(dateUtils.formatWeekday(date));
+        }
+
+
+
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return (displayedItems.get(position) instanceof Event ) ? VIEW_TYPE_EVENT : VIEW_TYPE_HEADER;
     }
 
     /**
@@ -108,10 +151,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
      * @param text  The search query
      */
     public void searchEvent(String text){
-        displayedEvents.clear();
+        displayedItems.clear();
         List<Event> filteredList = new ArrayList<>();
         if (text.trim().isEmpty()||text.length()<2){
-            displayedEvents.addAll(events);
+            displayedItems.addAll(events);
         }
         else {
             String query = text.toLowerCase();
@@ -121,7 +164,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                 }
             }
         }
-        displayedEvents.addAll(filteredList);
+        displayedItems.addAll(filteredList);
         notifyDataSetChanged();
     }
 
@@ -131,7 +174,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
      */
     @Override
     public int getItemCount() {
-        return displayedEvents.size();
+        return displayedItems.size();
     }
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
@@ -143,6 +186,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             eventName = itemView.findViewById(R.id.eventName);
             eventDate = itemView.findViewById(R.id.eventDate);
             btnDelete = itemView.findViewById(R.id.btnDelete);
+        }
+    }
+
+
+    public static class DateHeaderViewHolder extends RecyclerView.ViewHolder {
+        TextView dateHeader;
+        public DateHeaderViewHolder(@NonNull View itemView) {
+            super(itemView);
+            dateHeader = itemView.findViewById(R.id.item_date_header);
         }
     }
 }

@@ -37,23 +37,50 @@ public class EventDetailsViewModel extends AndroidViewModel{
         repository = EventRepository.getInstance(application);
     }
 
+    /**
+     * Gets the event name
+     * @return  The event name
+     */
     public LiveData<String> getEventName(){
         return eventName;
     }
+
+    /**
+     * Gets the event date
+     * @return  The event date
+     */
     public LiveData<String> getEventDate(){
         return eventDate;
     }
+
+    /**
+     * Gets the success of saving the event
+     * @return  The success of saving the event
+     */
     public LiveData<Boolean>  getSaveSuccess(){
         return saveSuccess;
     }
 
+    /**
+     * Gets the error message
+     * @return  The error message
+     */
     public MutableLiveData<String> getErrorMessage() {
         return errorMessage;
     }
 
+    /**
+     * Sets the event name
+     * @param name  The event name
+     */
     public void setEventName(String name){
         eventName.setValue(name);
     }
+
+    /**
+     * Sets the event date
+     * @param date  The event date
+     */
     public void setEventDate(String date){
 
         eventDate.setValue(date);

@@ -13,11 +13,18 @@ import com.cs360.eventtrackeratsushi.util.NotificationHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ViewModel for DashboardActivity
+ */
 public class DashboardViewModel extends AndroidViewModel{
     private final EventRepository repository;
     private final MutableLiveData<String> username = new MutableLiveData<>();
     private final MutableLiveData<List<Event>> events = new MutableLiveData<>();
 
+    /**
+     * Constructor for DashboardViewModel
+     * @param application  The application
+     */
     public DashboardViewModel(@NonNull Application application) {
         super(application);
         repository = EventRepository.getInstance(application);
@@ -25,20 +32,34 @@ public class DashboardViewModel extends AndroidViewModel{
         loadEvents();
     }
 
+    /**
+     * Gets the events for the current user
+     * @return  The events for the current user
+     */
     public LiveData<List<Event>> getEvents(){
         return events;
     }
 
+    /**
+     * Loads the events for the current user from the database
+     */
     public void loadEvents(){
         events.setValue(repository.getEventsForUser());
     }
 
+    /**
+     * Deletes the event from the database
+     * @param event  The event to delete
+     */
     public void deleteEvent(Event event){
         repository.deleteEvent(event.getId());
         NotificationHelper.cancelNotification(getApplication(), event.getId());
         loadEvents();
     }
 
+    /**
+     * Deletes all events from the database
+     */
     public void deleteAllEvents(){
         Event[] events = new Event[repository.getEventsForUser().size()];
         events = repository.getEventsForUser().toArray(events);
@@ -49,21 +70,19 @@ public class DashboardViewModel extends AndroidViewModel{
         loadEvents();
     }
 
+    /**
+     * Gets the username for the current user
+     * @return  The username for the current user
+     */
     public LiveData<String> getUsername(){
         return username;
     }
 
+    /**
+     * Sets the username for the current user
+     */
     public void clearEvents(){
         events.setValue(new ArrayList<>());
     }
 
-    public void createEvent(String title, String date){
-        repository.createEvent(title, date);
-        loadEvents();
-    }
-
-    public void updateEvent(int eventId, String newTitle, String newDate){
-        repository.updateEvent(eventId, newTitle, newDate);
-        loadEvents();
-    }
 }

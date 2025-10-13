@@ -13,6 +13,9 @@ import com.cs360.eventtrackeratsushi.respository.EventRepository;
 import com.cs360.eventtrackeratsushi.respository.UserRepository;
 import com.cs360.eventtrackeratsushi.util.NotificationHelper;
 
+/**
+ * ViewModel for LoginActivity and handles account related functions
+ */
 public class LoginViewModel extends AndroidViewModel {
     private final String TAG = "LoginViewModel";
     private final UserRepository repository;
@@ -22,6 +25,10 @@ public class LoginViewModel extends AndroidViewModel {
     private final MutableLiveData<String> message = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoggedIn = new MutableLiveData<>();
 
+    /**
+     * Constructor for LoginViewModel
+     * @param application  The application
+     */
     public LoginViewModel(@NonNull Application application){
         super(application);
         repository = UserRepository.getInstance(application);
@@ -29,14 +36,32 @@ public class LoginViewModel extends AndroidViewModel {
         isLoggedIn.setValue(repository.isLoggedIn());
     }
 
+    /**
+     * Gets the login status
+     * @return
+     */
     public LiveData<Boolean> getLoginStatus(){
         return isLoggedIn;
     }
+
+    /**
+     * Gets the login success
+     * @return  The login success
+     */
     public LiveData<Boolean> getLoginSuccess() {return loginSuccess;}
 
+    /**
+     * Gets the message
+     * @return  The message
+     */
     public LiveData<String> getMessage(){
         return message;
     }
+
+    /**
+     * Gets the password check
+     * @return  The password check
+     */
     public LiveData<Boolean> getPasswordCheck(){ return passwordCheck;}
 
     /**
