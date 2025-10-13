@@ -1,30 +1,22 @@
 package com.cs360.eventtrackeratsushi.ui;
 
-import android.app.AlarmManager;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
-import android.os.Bundle;
 
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.os.Bundle;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.R;
 import com.cs360.eventtrackeratsushi.adapter.EventAdapter;
 import com.cs360.eventtrackeratsushi.viewmodel.DashboardViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.util.Objects;
 
 

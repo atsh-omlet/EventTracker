@@ -14,6 +14,9 @@ import com.cs360.eventtrackeratsushi.viewmodel.LoginViewModel;
 
 import java.util.Objects;
 
+/**
+ * Activity for setting a new password
+ */
 public class NewPasswordActivity extends AppCompatActivity {
     private static final String TAG = "NewPasswordActivity";
     private EditText etNewPassword, etConfirmPassword;

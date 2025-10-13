@@ -4,6 +4,9 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import io.realm.kotlin.types.annotations.Index
 
+/**
+ * User model class
+ */
 class User : RealmObject {
     constructor()
     constructor(id: Int, username: String, password: String) {

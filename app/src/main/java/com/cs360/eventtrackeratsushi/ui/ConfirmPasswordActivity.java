@@ -5,16 +5,16 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
-
 import com.cs360.eventtrackeratsushi.R;
 import com.cs360.eventtrackeratsushi.viewmodel.LoginViewModel;
-
 import java.util.Objects;
 
+/**
+ * Activity for confirming password
+ */
 public class ConfirmPasswordActivity extends AppCompatActivity {
     private static final String TAG = "ConfirmPasswordActivity";
     private static final String CHANGE_PASSWORD = "change_password";
@@ -37,6 +37,7 @@ public class ConfirmPasswordActivity extends AppCompatActivity {
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
 
+        // Set the title based on the action type
         String action_type = getIntent().getStringExtra("action_type");
         assert action_type != null;
         if (action_type.equals(CHANGE_PASSWORD)) {
@@ -45,6 +46,11 @@ public class ConfirmPasswordActivity extends AppCompatActivity {
             Objects.requireNonNull(getSupportActionBar()).setTitle("Delete Account");
         }
 
+        /**
+         * Handle password check result
+         * if action_type is CHANGE_PASSWORD, check password
+         * if action_type is DELETE_ACCOUNT, delete account
+         */
         loginViewModel.getPasswordCheck().observe(this, success -> {
             switch (action_type) {
                 case CHANGE_PASSWORD:
@@ -71,6 +77,11 @@ public class ConfirmPasswordActivity extends AppCompatActivity {
             }
         });
 
+        /**
+         * Handle button click
+         * if action_type is CHANGE_PASSWORD, check password
+         * if action_type is DELETE_ACCOUNT, delete account
+         */
         btnConfirm.setOnClickListener(view -> {
             String password = etPassword.getText().toString().trim();
             switch (action_type) {

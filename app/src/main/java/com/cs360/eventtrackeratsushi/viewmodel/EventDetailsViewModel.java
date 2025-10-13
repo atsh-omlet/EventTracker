@@ -28,6 +28,10 @@ public class EventDetailsViewModel extends AndroidViewModel{
     private int eventId = -1;
     private final int THIRTY_MINUTES = 60000 * 30;
 
+    /**
+     * Constructor for EventDetailsViewModel
+     * @param application  The application
+     */
     public EventDetailsViewModel(@NonNull Application application) {
         super(application);
         repository = EventRepository.getInstance(application);
@@ -55,6 +59,9 @@ public class EventDetailsViewModel extends AndroidViewModel{
         eventDate.setValue(date);
     }
 
+    /**
+     * Loads the event from the database
+     */
     public void loadEvent(int eventId){
         Event event = repository.getEvent(eventId);
         if (event != null) {
@@ -64,15 +71,20 @@ public class EventDetailsViewModel extends AndroidViewModel{
         }
     }
 
+    /**
+     * Saves the event to the database
+     */
     public void saveEvent(){
+
         if (Objects.requireNonNull(eventName.getValue()).isEmpty()||
                 Objects.requireNonNull(eventDate.getValue()).isEmpty()){
             errorMessage.setValue("Event name and date cannot be empty.");
             return;
         }
         boolean result;
+
         Event event;
-        if (eventId == -1){
+        if (eventId == -1){ // Create new event
             result = repository.createEvent(eventName.getValue(), eventDate.getValue());
             if (result){
                 int newId = repository.getLastEventId();
@@ -81,25 +93,26 @@ public class EventDetailsViewModel extends AndroidViewModel{
                 event = null;
             }
         }
-        else {
+        else { // Update existing event
             result = repository.updateEvent(eventId, eventName.getValue(), eventDate.getValue());
             event = repository.getEvent(eventId);
         }
 
-        if (result && event != null){
+        if (result && event != null){ // Schedule notification for event
             long eventTime = dateUtils.parseDateToMillis(event.getDate());
             long currentTime = System.currentTimeMillis();
             Log.d(TAG, "Event time: " + new Date(eventTime));
             Log.d(TAG, "Current time: " + new Date(currentTime));
 
 
+            // If event time is in the future, schedule notification
             if (eventTime > currentTime){
-                if (eventTime - currentTime > THIRTY_MINUTES) {
+                if (eventTime - currentTime > THIRTY_MINUTES) { // If event is more than 30 minutes away, schedule notification
                     eventTime -= THIRTY_MINUTES;
                     NotificationHelper.scheduleNotification(getApplication(), event, eventTime);
                     Log.d(TAG, "Notification scheduled for event: " + event.getTitle() + " at " + new Date(eventTime));
                 }
-                else {
+                else { // If event is less than 30 minutes away, schedule notification now
                     NotificationHelper.scheduleNotification(getApplication(), event, currentTime);
                     Log.d(TAG, "Notification scheduled for event: " + event.getTitle() + " at  + " + new Date(currentTime));
                 }

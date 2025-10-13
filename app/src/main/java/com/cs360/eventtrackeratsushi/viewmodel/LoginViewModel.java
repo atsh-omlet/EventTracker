@@ -39,6 +39,11 @@ public class LoginViewModel extends AndroidViewModel {
     }
     public LiveData<Boolean> getPasswordCheck(){ return passwordCheck;}
 
+    /**
+     * Logs in the user
+     * @param username  The user's username
+     * @param password  The user's password
+     */
     public void login(String username, String password) {
         if (username.isEmpty() || password.isEmpty()) {
             message.setValue("Please enter both a username and password.");
@@ -47,6 +52,7 @@ public class LoginViewModel extends AndroidViewModel {
         if (repository.login(username, password)) {
             loginSuccess.setValue(true);
             isLoggedIn.setValue(repository.isLoggedIn());
+            message.setValue("Welcome back, " + username + ".");
             Log.d(TAG, "login: " + repository.isLoggedIn());
         }
         else {
@@ -54,6 +60,12 @@ public class LoginViewModel extends AndroidViewModel {
         }
     }
 
+    /**
+     * Creates a new user
+     * @param username  The user's username
+     * @param password  The user's password
+     * @param passwordConfirm  The user's password confirmation
+     */
     public void createUser(String username, String password, String passwordConfirm){
         if (username.isEmpty()||password.isEmpty()||passwordConfirm.isEmpty()){
             message.setValue("Please enter a username and fill both password fields.");
@@ -66,6 +78,7 @@ public class LoginViewModel extends AndroidViewModel {
 
         if (repository.createUser(username, password, passwordConfirm)) {
             loginSuccess.setValue(true);
+            message.setValue("Account created. Welcome, " + username + ".");
             isLoggedIn.setValue(repository.isLoggedIn());
         }
         else {
@@ -73,6 +86,10 @@ public class LoginViewModel extends AndroidViewModel {
         }
     }
 
+    /**
+     * Checks the user's password
+     * @param password  The user's password
+     */
     public void checkPassword(String password){
         if (password.isEmpty()){
             message.setValue("Please enter a password.");
@@ -86,6 +103,11 @@ public class LoginViewModel extends AndroidViewModel {
         }
     }
 
+    /**
+     * Updates the user's password
+     * @param newPassword  The user's new password
+     * @param confirmPassword  The user's password confirmation
+     */
     public void updatePassword(String newPassword, String confirmPassword){
         if (newPassword.isEmpty() || confirmPassword.isEmpty()){
             message.setValue("Please enter a new password and confirm it.");
@@ -104,6 +126,10 @@ public class LoginViewModel extends AndroidViewModel {
 
     }
 
+    /**
+     * Deletes the user's account
+     * @param password  The user's password
+     */
     public void deleteAccount(String password){
         if (password.isEmpty()){
             message.setValue("Please enter a password.");
@@ -129,6 +155,9 @@ public class LoginViewModel extends AndroidViewModel {
         }
     }
 
+    /**
+     * Logs out the user
+     */
     public void logout(){
         repository.logout();
         isLoggedIn.setValue(false);

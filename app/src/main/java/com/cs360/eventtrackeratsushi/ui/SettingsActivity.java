@@ -12,13 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.SwitchPreferenceCompat;
-
 import com.cs360.eventtrackeratsushi.R;
 import com.cs360.eventtrackeratsushi.viewmodel.DashboardViewModel;
 import com.cs360.eventtrackeratsushi.viewmodel.LoginViewModel;
@@ -122,7 +118,7 @@ public class SettingsActivity extends AppCompatActivity {
                 // Show confirmation dialog
                 new AlertDialog.Builder(requireContext())
                         .setTitle("Delete Account")
-                        .setMessage("Are you sure you want to delete your account? This action cannot be undone.")
+                        .setMessage("Are you sure you want to delete your account?\nThis action cannot be undone.")
                         .setPositiveButton("Delete", (dialog, which) -> {
                             // Proceed to ConfirmPasswordActivity if user confirms
                             Intent intent = new Intent(requireContext(), ConfirmPasswordActivity.class);
@@ -142,7 +138,7 @@ public class SettingsActivity extends AppCompatActivity {
                 // Show confirmation dialog
                 new AlertDialog.Builder(requireContext())
                         .setTitle("Clear All Events")
-                        .setMessage("Are you sure you want to clear all events? This action cannot be undone.")
+                        .setMessage("Are you sure you want to clear all events?\nThis action cannot be undone.")
                         .setPositiveButton("Delete", (dialog, which) -> {
                             dashboardViewModel.deleteAllEvents();
                             Intent intent = new Intent(requireContext(), DashboardActivity.class);

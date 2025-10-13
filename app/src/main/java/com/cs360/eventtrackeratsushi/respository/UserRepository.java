@@ -51,6 +51,11 @@ public class UserRepository {
                 SecurityUtils.checkPassword(password, dbHelper.getPasssword(username));
     }
 
+    /**
+     * checks if password matches
+     * @param password password
+     * @return true if successful, false if not
+     */
     public boolean checkPassword(String password){
         return SecurityUtils.checkPassword(password, dbHelper.getPasssword(getUsername()));
     }
@@ -128,11 +133,20 @@ public class UserRepository {
         return false;
     }
 
+    /**
+     * updates password
+     * @param newPassword new password
+     * @return true if successful, false if not
+     */
     public boolean updatePassword(String newPassword){
         String hashedPassword = SecurityUtils.hashPassword(newPassword);
         return dbHelper.updatePassword(getUserId(), hashedPassword);
     }
 
+    /**
+     * deletes user
+     * @return true if successful, false if not
+     */
     public boolean deleteUser(){
         boolean deleted = dbHelper.deleteUser(getUserId());
         //sessionManager.clearSession();

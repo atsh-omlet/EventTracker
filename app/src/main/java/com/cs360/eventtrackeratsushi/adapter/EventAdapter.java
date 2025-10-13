@@ -103,6 +103,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         });
     }
 
+    /**
+     * Search for events based on title
+     * @param text  The search query
+     */
     public void searchEvent(String text){
         displayedEvents.clear();
         List<Event> filteredList = new ArrayList<>();

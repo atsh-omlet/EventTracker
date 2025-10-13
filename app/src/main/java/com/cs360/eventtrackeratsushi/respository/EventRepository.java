@@ -90,6 +90,10 @@ public class EventRepository {
         return dbHelper.deleteEvent(eventId);
     }
 
+    /**
+     * deletes all events associated with a userId
+     * @return true if successful, false if not
+     */
     public boolean deleteAllEvents(){
         return dbHelper.deleteAllEvents(sessionManager.getUserId());
     }

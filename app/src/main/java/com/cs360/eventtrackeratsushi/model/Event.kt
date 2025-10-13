@@ -5,6 +5,9 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * Event model class
+ */
 class Event : RealmObject {
     @PrimaryKey
     var id: Int = 0
