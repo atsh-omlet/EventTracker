@@ -36,6 +36,7 @@
         android:layout_height="wrap_content"
         android:src="@android:drawable/ic_input_add"
         android:contentDescription="@string/add_event"
+        app:tint="@color/white"
         app:backgroundTint="?attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
