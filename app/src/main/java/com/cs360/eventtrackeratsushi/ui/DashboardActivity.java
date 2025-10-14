@@ -4,6 +4,8 @@ package com.cs360.eventtrackeratsushi.ui;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +17,7 @@ import android.view.MenuItem;
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.R;
 import com.cs360.eventtrackeratsushi.adapter.EventAdapter;
+import com.cs360.eventtrackeratsushi.util.DateTimePickerHelper;
 import com.cs360.eventtrackeratsushi.viewmodel.DashboardViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.Objects;
@@ -92,6 +95,42 @@ public class DashboardActivity extends AppCompatActivity
 
 
         MenuItem searchItem = menu.findItem(R.id.search);
+        MenuItem filterItem = menu.findItem(R.id.filter);
+
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(@NonNull MenuItem item) {
+                // Collapse filter when search expands
+                if (filterItem.isActionViewExpanded()) {
+                    filterItem.collapseActionView();
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(@NonNull MenuItem item) {
+                eventAdapter.searchEvent("");
+                return true;
+            }
+        });
+
+        filterItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(@NonNull MenuItem item) {
+                // Collapse search when filter expands
+                if (searchItem.isActionViewExpanded()) {
+                    searchItem.collapseActionView();
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(@NonNull MenuItem item) {
+                eventAdapter.filterEvents("");
+                return true;
+            }
+        });
+
 
         SearchView searchView = (SearchView) searchItem.getActionView();
         assert searchView != null;
@@ -99,13 +138,40 @@ public class DashboardActivity extends AppCompatActivity
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                eventAdapter.searchEvent(query);
+                eventAdapter.searchEvent(query.trim());
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                eventAdapter.searchEvent(newText);
+                eventAdapter.searchEvent(newText.trim());
+                return true;
+            }
+        });
+
+        SearchView filterView = (SearchView) filterItem.getActionView();
+        assert filterView != null;
+        filterView.setQueryHint("yyyy mm dd");
+        filterView.setInputType(0);
+
+        filterView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                String normalized = query.trim()
+                        .replaceAll("[^0-9/\\- ]", "")
+                        .replaceAll("[/ ]", "-")
+                        .replaceAll("-+$", "");
+
+                eventAdapter.filterEvents(normalized);
+                return true;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                String normalized = newText.trim()
+                        .replaceAll("[^0-9/\\- ]", "")
+                        .replaceAll("[/ ]", "-")
+                        .replaceAll("-+$", "");
+                eventAdapter.filterEvents(normalized);
                 return true;
             }
         });

@@ -17,7 +17,7 @@ public class DateTimePickerHelper {
     /**
      * Show date picker dialog to select event date. Past dates are restricted.
      */
-    public static void showDatePicker(Context context, OnDateTimeSelectedListener listener) {
+    public static void showDateTimePicker(Context context, OnDateTimeSelectedListener listener) {
         Calendar calendar = Calendar.getInstance();
 
         DatePickerDialog datePicker = new DatePickerDialog(
@@ -58,6 +58,28 @@ public class DateTimePickerHelper {
         timePicker.show();
     }
 
+
+    /**
+     * Show date picker dialog to select event date.
+     * @param context
+     * @param listener
+     */
+    public static void showDatePicker(Context context, OnDateTimeSelectedListener listener) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        DatePickerDialog datePicker = new DatePickerDialog(
+                context,
+                (view, year1, month1, dayOfMonth) -> {
+                    String selectedDate = String.format(Locale.getDefault(),
+                            "%04d-%02d-%02d",
+                            year1, month1 + 1, dayOfMonth);
+                    listener.onDateTimeSelected(selectedDate);
+
+                }, year, month, day);
+        datePicker.show();
+    }
 
 
 }

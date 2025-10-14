@@ -15,4 +15,5 @@
     <string name="menu">menu</string>
     <string name="search">search</string>
     <string name="confirm">Confirm</string>
+    <string name="filter">filter</string>
 </resources>

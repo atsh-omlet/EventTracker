@@ -59,24 +59,7 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.events.clear();
         this.events.addAll(events);
         displayedItems.clear();
-
-        String lastDate = null;
-        for (Event event: events){
-            String eventDate = dateUtils.formatWeekday(event.getDate());
-            if (!eventDate.equals(lastDate)){
-                Log.d(TAG, "eventDate: " + eventDate);
-                Log.d(TAG, "lastDate: " + lastDate);
-                Log.d(TAG, "Adding header for eventDate: " + eventDate);
-                if (dateUtils.isToday(event.getDate())) {
-                    displayedItems.add(eventDate+ " (Today)");
-                } else {
-                    displayedItems.add(eventDate);
-                }
-                lastDate = eventDate;
-            }
-            displayedItems.add(event);
-        }
-        notifyDataSetChanged();
+        rebuildDisplayedItems(events);
     }
 
     /**
@@ -134,7 +117,7 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         } else if (viewType == VIEW_TYPE_HEADER) {
             String date = (String) displayedItems.get(position);
             DateHeaderViewHolder headerHolder = (DateHeaderViewHolder) holder;
-            headerHolder.dateHeader.setText(dateUtils.formatWeekday(date));
+            headerHolder.dateHeader.setText(date);
         }
 
 
@@ -154,7 +137,7 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         displayedItems.clear();
         List<Event> filteredList = new ArrayList<>();
         if (text.trim().isEmpty()||text.length()<2){
-            displayedItems.addAll(events);
+            rebuildDisplayedItems(events);
         }
         else {
             String query = text.toLowerCase();
@@ -164,8 +147,27 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 }
             }
         }
-        displayedItems.addAll(filteredList);
-        notifyDataSetChanged();
+        rebuildDisplayedItems(filteredList);
+    }
+
+    /**
+     * Filter events based on date
+     * @param date  The date to filter by date
+     */
+    public void filterEvents (String date) {
+        displayedItems.clear();
+        List<Event> filteredList = new ArrayList<>();
+
+        if (date.trim().isEmpty()||date.length()<4){
+            rebuildDisplayedItems(events);
+            return;
+        }
+        for (Event event : events){
+            if (dateUtils.formatDate(event.getDate()).startsWith(date)){
+                filteredList.add(event);
+            }
+        }
+        rebuildDisplayedItems(filteredList);
     }
 
     /**
@@ -187,6 +189,26 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             eventDate = itemView.findViewById(R.id.eventDate);
             btnDelete = itemView.findViewById(R.id.btnDelete);
         }
+    }
+
+    public void rebuildDisplayedItems(List<Event> events){
+        String lastDate = null;
+        for (Event event: events){
+            String eventDate = dateUtils.formatWeekday(event.getDate());
+            if (!eventDate.equals(lastDate)){
+                Log.d(TAG, "eventDate: " + eventDate);
+                Log.d(TAG, "lastDate: " + lastDate);
+                Log.d(TAG, "Adding header for eventDate: " + eventDate);
+                if (dateUtils.isToday(event.getDate())) {
+                    displayedItems.add(eventDate+ " (Today)");
+                } else {
+                    displayedItems.add(eventDate);
+                }
+                lastDate = eventDate;
+            }
+            displayedItems.add(event);
+        }
+        notifyDataSetChanged();
     }
 
 

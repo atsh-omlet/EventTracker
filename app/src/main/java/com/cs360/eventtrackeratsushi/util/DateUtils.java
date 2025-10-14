@@ -9,9 +9,9 @@ import java.util.Locale;
 import java.util.Calendar;
 
 public class DateUtils {
-    private final String TAG = "DateUtils";
+    private static final String TAG = "DateUtils";
     /**
-     * Returns a formatted time string for display use
+     * Returns a formatted time string
      * @param date  The date to format
      * @return  The formatted time string
      */
@@ -24,13 +24,32 @@ public class DateUtils {
             SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.getDefault());
             return timeFormat.format(parsedDate);
         } catch (ParseException e) {
-            Log.e("TAG", "Error parsing date: " + e.getMessage());
+            Log.e(TAG, "Error parsing date: " + e.getMessage());
             return date;
         }
     }
 
     /**
-     * Returns a formatted date string for display use
+     * Returns a formatted date string
+     * @param date  The date to format
+     * @return  The formatted date string
+     */
+    public String formatDate(String date){
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+            Date parsedDate = inputFormat.parse(date);
+            assert parsedDate != null;
+
+            SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            return timeFormat.format(parsedDate);
+        } catch (ParseException e) {
+            Log.e(TAG, "Error parsing date: " + e.getMessage());
+            return date;
+        }
+    }
+
+    /**
+     * Returns a formatted date string
      * @param date  The date to format
      * @return  The formatted date string
      */
@@ -52,7 +71,7 @@ public class DateUtils {
                     Locale.getDefault());
             return outputFormat.format(parsedDate);
         } catch (ParseException e) {
-            Log.e("TAG", "Error parsing date: " + e.getMessage());
+            Log.e(TAG, "Error parsing date: " + e.getMessage());
             return date;
         }
     }

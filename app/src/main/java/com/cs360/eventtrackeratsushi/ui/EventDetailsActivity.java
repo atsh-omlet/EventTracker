@@ -74,7 +74,7 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         // show date picker when etDate is clicked
         etDate.setOnClickListener(v ->
-                DateTimePickerHelper.showDatePicker(this, dateTime -> {
+                DateTimePickerHelper.showDateTimePicker(this, dateTime -> {
                     etDate.setText(dateTime);
                 }));
         // save event details
