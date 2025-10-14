@@ -16,4 +16,5 @@
     <string name="search">search</string>
     <string name="confirm">Confirm</string>
     <string name="filter">filter</string>
+    <string name="update_password">Update Password</string>
 </resources>

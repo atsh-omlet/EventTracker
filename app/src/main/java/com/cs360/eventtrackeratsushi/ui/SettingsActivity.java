@@ -112,7 +112,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
             if (preference.getKey().equals(DELETE_ACCOUNT_KEY)) {
                 // Show confirmation dialog
-                new AlertDialog.Builder(requireContext())
+                AlertDialog deleteAccountDialog = new AlertDialog.Builder(requireContext())
                         .setTitle("Delete Account")
                         .setMessage("Are you sure you want to delete your account?\nThis action cannot be undone.")
                         .setPositiveButton("Delete", (dialog, which) -> {
@@ -127,12 +127,13 @@ public class SettingsActivity extends AppCompatActivity {
                         })
                         .setCancelable(true)
                         .show();
+                deleteAccountDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED);
                 return true;
             }
 
             if (preference.getKey().equals(CLEAR_EVENTS_KEY)) {
                 // Show confirmation dialog
-                new AlertDialog.Builder(requireContext())
+                AlertDialog clearEventsDialog = new AlertDialog.Builder(requireContext())
                         .setTitle("Clear All Events")
                         .setMessage("Are you sure you want to clear all events?\nThis action cannot be undone.")
                         .setPositiveButton("Delete", (dialog, which) -> {
@@ -148,6 +149,8 @@ public class SettingsActivity extends AppCompatActivity {
                         })
                         .setCancelable(true)
                         .show();
+
+                clearEventsDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED);
                 return true;
             }
 

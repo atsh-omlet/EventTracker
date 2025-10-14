@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.R;
 import com.cs360.eventtrackeratsushi.adapter.EventAdapter;
-import com.cs360.eventtrackeratsushi.util.DateTimePickerHelper;
 import com.cs360.eventtrackeratsushi.viewmodel.DashboardViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.Objects;
