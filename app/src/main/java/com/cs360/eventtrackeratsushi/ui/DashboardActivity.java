@@ -35,6 +35,10 @@ public class DashboardActivity extends AppCompatActivity
     private DashboardViewModel dashboardViewModel;
 
 
+    /**
+     *  triggered when activity is created
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +82,9 @@ public class DashboardActivity extends AppCompatActivity
 
     }
 
+    /**
+     *  triggered when activity is resumed
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -89,6 +96,11 @@ public class DashboardActivity extends AppCompatActivity
         super.onDestroy();
     }
 
+    /**
+     *  triggered when menu is created
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.event_menu, menu);
@@ -179,6 +191,11 @@ public class DashboardActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * triggered when settings icon is clicked
+     * @param item  The menu item that was selected.
+     * @return  true if the action was handled, false otherwise.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.settings) {
