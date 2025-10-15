@@ -150,7 +150,7 @@ public class UserRepository {
     public boolean deleteUser(){
         boolean deleted = dbHelper.deleteUser(getUserId());
         //sessionManager.clearSession();
-        Log.d(TAG, "isLoggedIn: " +sessionManager.isLoggedIn());
+        Log.d(TAG, "isLoggedIn: " + sessionManager.isLoggedIn());
         return deleted;
     }
 

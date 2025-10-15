@@ -30,6 +30,19 @@ public class NotificationHelper {
         Log.d(TAG, "Notification time: " + new Date(notificationTime));
         Log.d(TAG, "Current time: " + new Date(System.currentTimeMillis()));
 
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        if (alarmManager == null) {
+            Log.e(TAG, "AlarmManager is null");
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (!alarmManager.canScheduleExactAlarms()) {
+                Log.d(TAG, "Exact alarm scheduling is DENIED. Cannot schedule notification.");
+                return;
+            }
+        }
+        // Permission is either granted or not needed
         Intent intent = new Intent(context, NotificationReceiver.class);
         intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
         intent.putExtra("title", event.getTitle());
@@ -42,38 +55,14 @@ public class NotificationHelper {
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
-        if (alarmManager == null) {
-            Log.e(TAG, "AlarmManager is null");
-            return;
-        }
-
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                if (alarmManager.canScheduleExactAlarms()) {
-                    alarmManager.setExactAndAllowWhileIdle(
-                            AlarmManager.RTC_WAKEUP,
-                            notificationTime,
-                            pendingIntent
-                    );
-                    Log.d(TAG, "Notification scheduled for event: " + event.getTitle());
-                } else {
-                    Intent intent2 = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
-                    intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(intent2);
-                    Log.e(TAG, "Exact alarm scheduling not available");
-                }
-            } else {
-                alarmManager.setExactAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP,
-                        notificationTime,
-                        pendingIntent
-                );
-                Log.d(TAG, "Notification scheduled for event (pre-Android S): " + event.getTitle());
-            }
-        } catch (SecurityException e){
-            Log.e(TAG, "SecurityException: " + e.getMessage());
+            alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    notificationTime,
+                    pendingIntent
+            );
+        } catch (SecurityException e) {
+                Log.e(TAG, "SecurityException: " + e.getMessage());
         }
     }
 

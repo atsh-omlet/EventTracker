@@ -10,6 +10,7 @@ import android.content.Intent;
 
 import androidx.core.app.NotificationCompat;
 
+import com.cs360.eventtrackeratsushi.R;
 import com.cs360.eventtrackeratsushi.ui.MainActivity;
 
 /**
@@ -54,7 +55,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle("Upcoming Event")
                 .setContentText("Your event \"" + title + "\" is starting soon at " + date + "!")
                 .setContentIntent(contentIntent)

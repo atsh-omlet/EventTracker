@@ -1,6 +1,7 @@
 package com.cs360.eventtrackeratsushi.util;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,48 +28,60 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
-            Log.d(TAG, "Boot completed. Re-scheduling notifications.");
-
-            // Perform disk I/O off the main thread
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-            executor.execute(() -> {
-                EventRepository repository = EventRepository.getInstance(context.getApplicationContext());
-                List<Event> allEvents = repository.getEventsForUser();
-                DateUtils dateUtils = new DateUtils();
-
-                long currentTime = System.currentTimeMillis();
-
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.SCHEDULE_EXACT_ALARM) != PackageManager.PERMISSION_GRANTED) {
-                        Log.e(TAG, "Cannot re-schedule alarms after boot: SCHEDULE_EXACT_ALARM permission not granted.");
-                        return;
-                    }
-                }
-
-
-                for (Event event : allEvents) {
-                    long eventTimeMillis = dateUtils.parseDateToMillis(event.getDate());
-
-                    // Only re-schedule notifications for events that are in the future
-                    if (eventTimeMillis > currentTime) {
-                        long notificationTime = eventTimeMillis - THIRTY_MINUTES;
-
-
-                        if (notificationTime <= currentTime) {
-                            notificationTime = currentTime + 5000;
-                        }
-
-                        try {
-                            NotificationHelper.scheduleNotification(context, event, notificationTime);
-                            Log.d(TAG, "Re-scheduled notification for event: " + event.getTitle());
-                        } catch (SecurityException e) {
-                            Log.e(TAG, "Failed to re-schedule notification for " + event.getTitle(), e);
-                        }
-                    }
-                }
-            });
+        if (!Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())){
+            return;
         }
+
+        Log.d(TAG, "Boot completed. Re-scheduling notifications.");
+
+        // Check for essential notification permission (API 33/Tiramisu+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                Log.e(TAG, "Cannot re-schedule alarms after boot: POST_NOTIFICATIONS permission not granted. Notifications will be blocked.");
+                return;
+            }
+        }
+
+        // Check for exact alarm permission (API 31/S+) using the correct API
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            // Must check for null and canScheduleExactAlarms()
+            if (alarmManager == null || !alarmManager.canScheduleExactAlarms()) {
+                Log.e(TAG, "Cannot re-schedule alarms after boot: SCHEDULE_EXACT_ALARM permission not granted or AlarmManager unavailable.");
+                return;
+            }
+        }
+
+        // Perform disk I/O off the main thread
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            EventRepository repository = EventRepository.getInstance(context.getApplicationContext());
+            List<Event> allEvents = repository.getEventsForUser();
+            DateUtils dateUtils = new DateUtils();
+
+            long currentTime = System.currentTimeMillis();
+            Log.d(TAG, "Current time: " + currentTime);
+
+            for (Event event : allEvents) {
+                long eventTimeMillis = dateUtils.parseDateToMillis(event.getDate());
+
+                // Only re-schedule notifications for events that are in the future
+                if (eventTimeMillis > currentTime) {
+                    long notificationTime = eventTimeMillis - THIRTY_MINUTES;
+
+
+                    if (notificationTime <= currentTime) {
+                        notificationTime = currentTime + 5000;
+                    }
+
+                    try {
+                        NotificationHelper.scheduleNotification(context, event, notificationTime);
+                        Log.d(TAG, "Re-scheduled notification for event: " + event.getTitle());
+                    } catch (SecurityException e) {
+                        Log.e(TAG, "Failed to re-schedule notification for " + event.getTitle(), e);
+                    }
+                }
+            }
+        });
     }
 }

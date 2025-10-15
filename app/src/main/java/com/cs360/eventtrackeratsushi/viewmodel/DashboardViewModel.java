@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel;
 
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.respository.EventRepository;
+import com.cs360.eventtrackeratsushi.util.AppStateHelper;
 import com.cs360.eventtrackeratsushi.util.NotificationHelper;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class DashboardViewModel extends AndroidViewModel{
     private final EventRepository repository;
     private final MutableLiveData<String> username = new MutableLiveData<>();
     private final MutableLiveData<List<Event>> events = new MutableLiveData<>();
+    private final AppStateHelper appStateHelper;
 
     /**
      * Constructor for DashboardViewModel
@@ -28,6 +30,7 @@ public class DashboardViewModel extends AndroidViewModel{
     public DashboardViewModel(@NonNull Application application) {
         super(application);
         repository = EventRepository.getInstance(application);
+        appStateHelper = AppStateHelper.getInstance(application);
         username.setValue(repository.getUsername());
         loadEvents();
     }
@@ -38,6 +41,14 @@ public class DashboardViewModel extends AndroidViewModel{
      */
     public LiveData<List<Event>> getEvents(){
         return events;
+    }
+
+    public boolean shouldRequestInitialPermissions() {
+        if (!appStateHelper.isPermissionsChecked()) {
+            appStateHelper.setPermissionsChecked();
+            return true;
+        }
+        return false;
     }
 
     /**

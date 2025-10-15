@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -14,9 +16,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.R;
 import com.cs360.eventtrackeratsushi.adapter.EventAdapter;
+import com.cs360.eventtrackeratsushi.util.PermissionHelper;
 import com.cs360.eventtrackeratsushi.viewmodel.DashboardViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.Objects;
@@ -34,9 +39,22 @@ public class DashboardActivity extends AppCompatActivity
     private DashboardViewModel dashboardViewModel;
 
 
+
+    // ActivityResultLauncher for requesting notifications permission
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    PermissionHelper.requestExactAlermSettings(this); // Request special access
+                    Toast.makeText(this, "Notifications granted! Thank you.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Notifications denied. Event reminders may not appear.", Toast.LENGTH_LONG).show();
+                }
+            });
+
+
     /**
      *  triggered when activity is created
-     * @param savedInstanceState
+     * @param savedInstanceState  The saved instance state
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,12 +89,18 @@ public class DashboardActivity extends AppCompatActivity
         });
 
 
+        // set up FAB
         FloatingActionButton fabAddEvent = findViewById(R.id.fabAddEvent);
         fabAddEvent.setOnClickListener(view -> {
             Intent intent = new Intent(DashboardActivity.this, EventDetailsActivity.class);
             startActivity(intent);
 ;
         });
+
+        // request notifications permission on first start up
+        if (dashboardViewModel.shouldRequestInitialPermissions()) {
+            PermissionHelper.requestNotificationPermission(this, requestPermissionLauncher);
+        }
 
 
     }
@@ -227,3 +251,4 @@ public class DashboardActivity extends AppCompatActivity
     }
 
 }
+

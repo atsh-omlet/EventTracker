@@ -199,9 +199,10 @@ class DatabaseHelper private constructor(context: Context) {
             .sort("date", Sort.ASCENDING)
             .find()
 
-        val list = ArrayList<Event>()
-        results.forEach { e -> list.add(Event(e.id, e.title, e.date, e.userId)) }
-        return list
+        val list = results.map { e ->
+            Event(e.id, e.title, e.date, e.userId)
+        }
+        return ArrayList(list)
     }
 
 
