@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import com.cs360.eventtrackeratsushi.R;
-import com.cs360.eventtrackeratsushi.viewmodel.LoginViewModel;
+import com.cs360.eventtrackeratsushi.viewmodel.SettingsViewModel;
 import java.util.Objects;
 
 /**
@@ -21,7 +21,7 @@ public class ConfirmPasswordActivity extends AppCompatActivity {
     private static final String DELETE_ACCOUNT = "delete_account";
     private EditText etPassword;
     private Button btnConfirm;
-    private LoginViewModel loginViewModel;
+    private SettingsViewModel settingsViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +34,7 @@ public class ConfirmPasswordActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         btnConfirm = findViewById(R.id.btnConfirm);
 
-        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        settingsViewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
 
 
         // Set the title based on the action type
@@ -51,7 +51,7 @@ public class ConfirmPasswordActivity extends AppCompatActivity {
          * if action_type is CHANGE_PASSWORD, check password
          * if action_type is DELETE_ACCOUNT, delete account
          */
-        loginViewModel.getPasswordCheck().observe(this, success -> {
+        settingsViewModel.getPasswordCheck().observe(this, success -> {
             switch (action_type) {
                 case CHANGE_PASSWORD:
                     if (success != null && success) {
@@ -71,7 +71,7 @@ public class ConfirmPasswordActivity extends AppCompatActivity {
 
             }
         });
-        loginViewModel.getMessage().observe(this, errorMessage -> {
+        settingsViewModel.getMessage().observe(this, errorMessage -> {
             if (errorMessage != null) {
                 Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
             }
@@ -86,10 +86,10 @@ public class ConfirmPasswordActivity extends AppCompatActivity {
             String password = etPassword.getText().toString().trim();
             switch (action_type) {
                 case CHANGE_PASSWORD:
-                    loginViewModel.checkPassword(password);
+                    settingsViewModel.checkPassword(password);
                     break;
                 case DELETE_ACCOUNT:
-                    loginViewModel.deleteAccount(password);
+                    settingsViewModel.deleteAccount(password);
                     break;
             }
 

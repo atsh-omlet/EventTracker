@@ -141,7 +141,7 @@ public class EventDetailsViewModel extends AndroidViewModel{
                 }
                 else { // If event is less than 30 minutes away, schedule notification now
                     NotificationHelper.scheduleNotification(getApplication(), event, currentTime);
-                    Log.d(TAG, "Notification scheduled for event: " + event.getTitle() + " at  + " + new Date(currentTime));
+                    Log.d(TAG, "Notification scheduled for event: " + event.getTitle() + " at " + new Date(currentTime));
                 }
             }
         }

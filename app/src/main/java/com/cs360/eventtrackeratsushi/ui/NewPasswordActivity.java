@@ -10,7 +10,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.cs360.eventtrackeratsushi.R;
-import com.cs360.eventtrackeratsushi.viewmodel.LoginViewModel;
+import com.cs360.eventtrackeratsushi.viewmodel.SettingsViewModel;
 
 import java.util.Objects;
 
@@ -21,7 +21,7 @@ public class NewPasswordActivity extends AppCompatActivity {
     private static final String TAG = "NewPasswordActivity";
     private EditText etNewPassword, etConfirmPassword;
     private Button btnConfirm;
-    private LoginViewModel loginViewModel;
+    private SettingsViewModel settingsViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,17 +35,17 @@ public class NewPasswordActivity extends AppCompatActivity {
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnConfirm = findViewById(R.id.btnConfirm);
 
-        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        settingsViewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
 
         Objects.requireNonNull(getSupportActionBar()).setTitle("Set New Password");
 
-        loginViewModel.getPasswordCheck().observe(this, success -> {
+        settingsViewModel.getPasswordCheck().observe(this, success -> {
             if (success != null && success) {
                 finish();
             }
         });
 
-        loginViewModel.getMessage().observe(this, message -> {
+        settingsViewModel.getMessage().observe(this, message -> {
             if (message != null) {
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
             }
@@ -54,7 +54,7 @@ public class NewPasswordActivity extends AppCompatActivity {
         btnConfirm.setOnClickListener(view -> {
             String newPassword = etNewPassword.getText().toString().trim();
             String confirmPassword = etConfirmPassword.getText().toString().trim();
-            loginViewModel.updatePassword(newPassword, confirmPassword);
+            settingsViewModel.updatePassword(newPassword, confirmPassword);
         });
     }
 }

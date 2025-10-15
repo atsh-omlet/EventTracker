@@ -1,8 +1,11 @@
 package com.cs360.eventtrackeratsushi.ui;
 
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -14,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -34,19 +39,19 @@ import java.util.Objects;
 public class DashboardActivity extends AppCompatActivity
     implements EventAdapter.OnDeleteClickListener, EventAdapter.OnItemLongClickListener{
 
+    private static final String TAG = "DashboardActivity";
+    private boolean isInitialSetUpFlow = false;
+
     private EventAdapter eventAdapter;
 
     private DashboardViewModel dashboardViewModel;
 
 
-
-    // ActivityResultLauncher for requesting notifications permission
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
-                    PermissionHelper.requestExactAlermSettings(this); // Request special access
-                    Toast.makeText(this, "Notifications granted! Thank you.", Toast.LENGTH_SHORT).show();
-                } else {
+                    PermissionHelper.requestExactAlarmSettings(this); // Request special access
+                    } else {
                     Toast.makeText(this, "Notifications denied. Event reminders may not appear.", Toast.LENGTH_LONG).show();
                 }
             });
@@ -58,6 +63,7 @@ public class DashboardActivity extends AppCompatActivity
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate called");
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_dashboard);
@@ -97,8 +103,9 @@ public class DashboardActivity extends AppCompatActivity
 ;
         });
 
+        isInitialSetUpFlow = dashboardViewModel.shouldRequestInitialPermissions();
         // request notifications permission on first start up
-        if (dashboardViewModel.shouldRequestInitialPermissions()) {
+        if (isInitialSetUpFlow && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PermissionHelper.requestNotificationPermission(this, requestPermissionLauncher);
         }
 
@@ -111,7 +118,47 @@ public class DashboardActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume called");
         dashboardViewModel.loadEvents();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            // only true when the app is not running for the first time
+            boolean isPastInitialSetup = !isInitialSetUpFlow;
+            Log.d(TAG, "isPastInitialSetup: " + isPastInitialSetup);
+
+            if (alarmManager != null && dashboardViewModel.wasPermissionGranted()
+                    && !alarmManager.canScheduleExactAlarms()) {
+                if (isPastInitialSetup && !dashboardViewModel.shouldOptOutReminder()){
+                    Log.d(TAG, "shouldOptOutReminder: " + dashboardViewModel.shouldOptOutReminder());
+                    showExactAlarmReGrantDialog();
+                }
+            }
+            if (alarmManager != null && dashboardViewModel.shouldRescheduleNotifications()
+                    && alarmManager.canScheduleExactAlarms()) {
+                dashboardViewModel.rescheduleNotifications();
+                dashboardViewModel.setRescheduleNotifications(false);
+            }
+        }
+    }
+
+    /**
+     * shows dialog to grant exact alarm permission
+     */
+    private void showExactAlarmReGrantDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Reminders Disabled")
+                .setMessage("Alarms & Reminders permission is disabled.\n" +
+                        "Please enable the permission to receive notifications.")
+                .setPositiveButton("Grant Access", (dialog, which) -> {
+                    PermissionHelper.requestExactAlarmSettings(this);
+                    dashboardViewModel.setRescheduleNotifications(true);
+                })
+                .setNeutralButton("Don't Remind Again", (dialog, which) -> {
+                    dashboardViewModel.setOptOutReminder();
+                    dashboardViewModel.setPermissionGranted(false);
+                })
+                .setNegativeButton("Later", null)
+                .show();
     }
 
     @Override

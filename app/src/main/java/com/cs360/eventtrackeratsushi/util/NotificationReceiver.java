@@ -34,6 +34,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
             NotificationManager manager = context.getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
+
         }
     }
 
@@ -53,10 +54,12 @@ public class NotificationReceiver extends BroadcastReceiver {
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         String channelId = "event_channel";
 
+        SessionManager sessionManager = SessionManager.getInstance(context);
+        String userName = sessionManager.getUsername();
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle("Upcoming Event")
+                .setContentTitle("Upcoming Event for " + userName)
                 .setContentText("Your event \"" + title + "\" is starting soon at " + date + "!")
                 .setContentIntent(contentIntent)
                 .setAutoCancel(true)

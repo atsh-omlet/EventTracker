@@ -46,8 +46,12 @@ public class BootReceiver extends BroadcastReceiver {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             // Must check for null and canScheduleExactAlarms()
-            if (alarmManager == null || !alarmManager.canScheduleExactAlarms()) {
-                Log.e(TAG, "Cannot re-schedule alarms after boot: SCHEDULE_EXACT_ALARM permission not granted or AlarmManager unavailable.");
+            if (alarmManager == null) {
+                Log.e(TAG, "Cannot re-schedule alarms after boot: AlarmManager unavailable.");
+                return;
+            }
+            if (!alarmManager.canScheduleExactAlarms()) {
+                Log.e(TAG, "Cannot re-schedule alarms after boot: SCHEDULE_EXACT_ALARM permission not granted.");
                 return;
             }
         }

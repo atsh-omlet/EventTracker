@@ -11,7 +11,7 @@ import io.realm.kotlin.query.Sort
 /**
  * Database layer
  */
-class DatabaseHelper private constructor(context: Context) {
+class DatabaseHelper private constructor() {
 
     private val realm: Realm
 
@@ -24,7 +24,7 @@ class DatabaseHelper private constructor(context: Context) {
         @JvmStatic
         fun getInstance(context: Context): DatabaseHelper {
             return instance ?: synchronized(this) {
-                instance ?: DatabaseHelper(context.applicationContext).also { instance = it }
+                instance ?: DatabaseHelper().also { instance = it }
             }
         }
     }

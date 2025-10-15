@@ -34,7 +34,7 @@ public class PermissionHelper {
      *  checks if permissions have been granted
      * @param context
      */
-    public static void requestExactAlermSettings(Context context){
+    public static void requestExactAlarmSettings(Context context){
 
         // SCHEDULE_EXACT_ALARM Special Access Permission (API 31+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

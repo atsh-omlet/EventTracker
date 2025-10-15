@@ -19,9 +19,7 @@ import com.cs360.eventtrackeratsushi.util.NotificationHelper;
 public class LoginViewModel extends AndroidViewModel {
     private final String TAG = "LoginViewModel";
     private final UserRepository repository;
-    private final EventRepository eventRepository;
     private final MutableLiveData<Boolean> loginSuccess = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> passwordCheck = new MutableLiveData<>();
     private final MutableLiveData<String> message = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoggedIn = new MutableLiveData<>();
 
@@ -32,7 +30,6 @@ public class LoginViewModel extends AndroidViewModel {
     public LoginViewModel(@NonNull Application application){
         super(application);
         repository = UserRepository.getInstance(application);
-        eventRepository = EventRepository.getInstance(application);
         isLoggedIn.setValue(repository.isLoggedIn());
     }
 
@@ -58,11 +55,7 @@ public class LoginViewModel extends AndroidViewModel {
         return message;
     }
 
-    /**
-     * Gets the password check
-     * @return  The password check
-     */
-    public LiveData<Boolean> getPasswordCheck(){ return passwordCheck;}
+
 
     /**
      * Logs in the user
@@ -111,83 +104,5 @@ public class LoginViewModel extends AndroidViewModel {
         }
     }
 
-    /**
-     * Checks the user's password
-     * @param password  The user's password
-     */
-    public void checkPassword(String password){
-        if (password.isEmpty()){
-            message.setValue("Please enter a password.");
-            return;
-        }
-        if (repository.checkPassword(password)){
-            passwordCheck.setValue(true);
-        }
-        else {
-            message.setValue("Invalid password. Please try again.");
-        }
-    }
-
-    /**
-     * Updates the user's password
-     * @param newPassword  The user's new password
-     * @param confirmPassword  The user's password confirmation
-     */
-    public void updatePassword(String newPassword, String confirmPassword){
-        if (newPassword.isEmpty() || confirmPassword.isEmpty()){
-            message.setValue("Please enter a new password and confirm it.");
-        } else if (!newPassword.equals(confirmPassword)){
-            message.setValue("Passwords do not match. Please try again.");
-        }
-        try {
-            if (repository.updatePassword(newPassword)){
-                message.setValue("Password updated successfully.");
-                passwordCheck.setValue(true);
-            }
-        } catch (Exception e){
-            message.setValue("Error updating password. Please try again.");
-            Log.d(TAG, "updatePassword: " + e.getMessage());
-        }
-
-    }
-
-    /**
-     * Deletes the user's account
-     * @param password  The user's password
-     */
-    public void deleteAccount(String password){
-        if (password.isEmpty()){
-            message.setValue("Please enter a password.");
-            return;
-        }else if (!repository.checkPassword(password)) {
-            message.setValue("Invalid password. Please try again.");
-            return;
-        }
-        try {
-            Event[] events = new Event[eventRepository.getEventsForUser().size()];
-            events = eventRepository.getEventsForUser().toArray(events);
-            for (Event event : events){
-                NotificationHelper.cancelNotification(getApplication(), event.getId());
-            }
-            if (repository.deleteUser()){
-                repository.logout();
-                message.setValue("Account deleted successfully.");
-                passwordCheck.setValue(true);
-            }
-        } catch (Exception e){
-            message.setValue("Error deleting account. Please try again.");
-            Log.d(TAG, "deleteAccount: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Logs out the user
-     */
-    public void logout(){
-        repository.logout();
-        isLoggedIn.setValue(false);
-        loginSuccess.setValue(false);
-        passwordCheck.setValue(false);
-     }
 
 }

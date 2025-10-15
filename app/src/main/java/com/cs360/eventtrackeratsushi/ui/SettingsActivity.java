@@ -12,8 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import com.cs360.eventtrackeratsushi.R;
-import com.cs360.eventtrackeratsushi.viewmodel.DashboardViewModel;
-import com.cs360.eventtrackeratsushi.viewmodel.LoginViewModel;
+import com.cs360.eventtrackeratsushi.viewmodel.SettingsViewModel;
 
 
 import java.util.Objects;
@@ -53,11 +52,18 @@ public class SettingsActivity extends AppCompatActivity {
     public static class SettingsFragment extends PreferenceFragmentCompat
     implements Preference.OnPreferenceClickListener{
 
-        private LoginViewModel loginViewModel;
+        private SettingsViewModel settingsViewModel;
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
-            loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
+            settingsViewModel = new ViewModelProvider(requireActivity()).get(SettingsViewModel.class);
+
+            settingsViewModel.getMessage().observe(requireActivity(), message -> {
+                if (message != null && !message.isEmpty()) {
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+                    settingsViewModel.getMessage().setValue(null);
+                }
+            });
 
             // Logout preference
             Preference logoutPreference = findPreference(LOGOUT_KEY);
@@ -88,15 +94,11 @@ public class SettingsActivity extends AppCompatActivity {
 
         @Override
         public boolean onPreferenceClick(Preference preference) {
-            DashboardViewModel dashboardViewModel =
-                    new ViewModelProvider(requireActivity()).get(DashboardViewModel.class);
             // handle log out button
             if (preference.getKey().equals(LOGOUT_KEY)) {
                 // clear login credentials
-                loginViewModel.logout();
+                settingsViewModel.logout();
 
-                // Clear the events LiveData
-                dashboardViewModel.clearEvents();
 
                 Intent intent = new Intent(requireContext(), MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -137,7 +139,7 @@ public class SettingsActivity extends AppCompatActivity {
                         .setTitle("Clear All Events")
                         .setMessage("Are you sure you want to clear all events?\nThis action cannot be undone.")
                         .setPositiveButton("Delete", (dialog, which) -> {
-                            dashboardViewModel.deleteAllEvents();
+                            settingsViewModel.deleteAllEvents();
                             Intent intent = new Intent(requireContext(), DashboardActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
