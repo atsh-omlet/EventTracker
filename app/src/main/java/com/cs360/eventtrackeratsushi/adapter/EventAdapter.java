@@ -136,13 +136,13 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void searchEvent(String text){
         displayedItems.clear();
         List<Event> filteredList = new ArrayList<>();
-        if (text.trim().isEmpty()||text.length()<2){
+        String normalized = text.trim().toLowerCase();
+        if (normalized.isEmpty()||text.length()<2){
             rebuildDisplayedItems(events);
         }
         else {
-            String query = text.toLowerCase();
             for (Event event : events){
-                if (event.getTitle().toLowerCase().contains(query)){
+                if (event.getTitle().toLowerCase().contains(normalized)){
                     filteredList.add(event);
                 }
             }
@@ -157,8 +157,12 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void filterEvents (String date) {
         displayedItems.clear();
         List<Event> filteredList = new ArrayList<>();
-
-        if (date.trim().isEmpty()||date.length()<4){
+        String normalized = date
+                .trim()
+                .replaceAll("[^0-9/\\- ]", "")
+                .replaceAll("[/ ]", "-")
+                .replaceAll("-+$", "");
+        if (normalized.isEmpty()||date.length()<4){
             rebuildDisplayedItems(events);
             return;
         }

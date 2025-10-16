@@ -22,7 +22,7 @@ public class NotificationHelper {
     private static final String TAG = "NotificationHelper";
 
 
-    @RequiresPermission(Manifest.permission.SCHEDULE_EXACT_ALARM)
+    //@RequiresPermission(Manifest.permission.SCHEDULE_EXACT_ALARM)
     public static void scheduleNotification(Context context, Event event, long notificationTime) {
         DateUtils dateUtils = new DateUtils();
 

@@ -26,6 +26,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     private EventDetailsViewModel eventDetailsViewModel;
     private int eventId = -1; // current event ID, -1 if new event
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

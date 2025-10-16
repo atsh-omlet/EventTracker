@@ -1,5 +1,10 @@
 package com.cs360.eventtrackeratsushi.viewmodel;
+
+import android.app.AlarmManager;
 import android.app.Application;
+import android.content.Context;
+import android.os.Build;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -13,6 +18,7 @@ import com.cs360.eventtrackeratsushi.util.AppStateHelper;
 import com.cs360.eventtrackeratsushi.util.DateUtils;
 import com.cs360.eventtrackeratsushi.util.NotificationHelper;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,8 +32,11 @@ public class DashboardViewModel extends AndroidViewModel{
     private final EventRepository repository;
     private final MutableLiveData<String> username = new MutableLiveData<>();
     private final MutableLiveData<List<Event>> events = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> shouldShowExactAlarmGrantDialog = new MutableLiveData<>();
+    private final Application application;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    private final AppStateHelper appStateHelper;
+    private final AppStateHelper appStateHelper = AppStateHelper.getInstance(getApplication());
 
     /**
      * Constructor for DashboardViewModel
@@ -35,10 +44,16 @@ public class DashboardViewModel extends AndroidViewModel{
      */
     public DashboardViewModel(@NonNull Application application) {
         super(application);
+        this.application = application;
         repository = EventRepository.getInstance(application);
-        appStateHelper = AppStateHelper.getInstance(application);
-        username.setValue(repository.getUsername());
+        username.postValue(repository.getUsername());
         loadEvents();
+    }
+
+    @Override
+    protected void onCleared(){
+        super.onCleared();
+        executor.shutdown();
     }
 
     /**
@@ -47,6 +62,18 @@ public class DashboardViewModel extends AndroidViewModel{
      */
     public LiveData<List<Event>> getEvents(){
         return events;
+    }
+
+    public LiveData<Boolean> getShouldShowExactAlarmGrantDialog(){
+        return shouldShowExactAlarmGrantDialog;
+    }
+
+    public void setShouldShowExactAlarmGrantDialog(boolean show){
+        if (Looper.myLooper()==Looper.getMainLooper()){
+            shouldShowExactAlarmGrantDialog.setValue(show);
+        } else {
+            shouldShowExactAlarmGrantDialog.postValue(show);
+        }
     }
 
 
@@ -105,7 +132,11 @@ public class DashboardViewModel extends AndroidViewModel{
      * Loads the events for the current user from the database
      */
     public void loadEvents(){
-        events.setValue(repository.getEventsForUser());
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            events.setValue(repository.getEventsForUser());
+        } else {
+            events.postValue(repository.getEventsForUser());
+        }
     }
 
     /**
@@ -113,20 +144,25 @@ public class DashboardViewModel extends AndroidViewModel{
      * @param event  The event to delete
      */
     public void deleteEvent(Event event){
-        repository.deleteEvent(event.getId());
-        NotificationHelper.cancelNotification(getApplication(), event.getId());
-        loadEvents();
+        executor.execute(() -> {
+            int eventId = event.getId();
+            NotificationHelper.cancelNotification(getApplication(), eventId);
+            repository.deleteEvent(eventId);
+            appStateHelper.setEventsModified(true);
+            Log.d(TAG, "Event deleted, id: " + eventId);
+            loadEvents();
+        });
     }
 
     public void rescheduleNotifications(){
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             EventRepository repository = EventRepository.getInstance(getApplication());
             List<Event> allEvents = repository.getEventsForUser();
             DateUtils dateUtils = new DateUtils();
 
             long currentTime = System.currentTimeMillis();
-            Log.d(TAG, "Current time: " + currentTime);
+            Log.d(TAG, "Rescheduling notifications for all events...");
+            Log.d(TAG, "Current time: " + new Date(currentTime));
 
             for (Event event : allEvents) {
                 long eventTimeMillis = dateUtils.parseDateToMillis(event.getDate());
@@ -142,15 +178,18 @@ public class DashboardViewModel extends AndroidViewModel{
 
                     try {
                         NotificationHelper.scheduleNotification(getApplication(), event, notificationTime);
-                        Log.d(TAG, "Re-scheduled notification for event: " + event.getTitle());
+                        Log.d(TAG, "    Re-scheduled notification for event: " + event.getTitle()
+                            + " at " + new Date(notificationTime));
                     } catch (SecurityException e) {
-                        Log.e(TAG, "Failed to re-schedule notification for " + event.getTitle(), e);
+                        Log.e(TAG, "    Failed to re-schedule notification for " + event.getTitle(), e);
                     }
                 }
             }
         });
 
     }
+
+
 
 
     /**
@@ -160,6 +199,26 @@ public class DashboardViewModel extends AndroidViewModel{
     public LiveData<String> getUsername(){
         return username;
     }
+
+    public void checkExactAlarmPermission(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AlarmManager alarmManager = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
+            // only true when the app is not running for the first time
+
+            if (alarmManager != null && wasPermissionGranted()
+                    && !alarmManager.canScheduleExactAlarms()) {
+                Log.d(TAG, "shouldOptOutReminder: " + shouldOptOutReminder());
+                setShouldShowExactAlarmGrantDialog(true);
+
+            }
+            if (alarmManager != null && shouldRescheduleNotifications()
+                    && alarmManager.canScheduleExactAlarms()) {
+                rescheduleNotifications();
+                setRescheduleNotifications(false);
+            }
+        }
+    }
+
 
 
 }

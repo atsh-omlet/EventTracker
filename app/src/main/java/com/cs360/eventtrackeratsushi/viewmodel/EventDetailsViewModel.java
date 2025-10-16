@@ -1,5 +1,6 @@
 package com.cs360.eventtrackeratsushi.viewmodel;
 import android.app.Application;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -9,12 +10,14 @@ import androidx.lifecycle.AndroidViewModel;
 
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.respository.EventRepository;
+import com.cs360.eventtrackeratsushi.util.AppStateHelper;
 import com.cs360.eventtrackeratsushi.util.DateUtils;
 import com.cs360.eventtrackeratsushi.util.NotificationHelper;
 
 import java.util.Date;
 import java.util.Objects;
-
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class EventDetailsViewModel extends AndroidViewModel{
     private final String TAG = "EventDetailsViewModel";
@@ -23,6 +26,8 @@ public class EventDetailsViewModel extends AndroidViewModel{
     private final MutableLiveData<String> eventDate = new MutableLiveData<>("");
     private final MutableLiveData<Boolean> saveSuccess = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final AppStateHelper appStateHelper = AppStateHelper.getInstance(getApplication());
     private final DateUtils dateUtils = new DateUtils();
 
     private int eventId = -1;
@@ -74,7 +79,11 @@ public class EventDetailsViewModel extends AndroidViewModel{
      * @param name  The event name
      */
     public void setEventName(String name){
-        eventName.setValue(name);
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            eventName.setValue(name);
+        } else {
+            eventName.postValue(name);
+        }
     }
 
     /**
@@ -82,20 +91,26 @@ public class EventDetailsViewModel extends AndroidViewModel{
      * @param date  The event date
      */
     public void setEventDate(String date){
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            eventDate.setValue(date);
+        } else {
+            eventDate.postValue(date);
+        }
 
-        eventDate.setValue(date);
     }
 
     /**
      * Loads the event from the database
      */
     public void loadEvent(int eventId){
+        executor.execute(() -> {
         Event event = repository.getEvent(eventId);
-        if (event != null) {
-            this.eventId = eventId;
-            eventName.setValue(event.getTitle());
-            eventDate.setValue(event.getDate());
-        }
+            if (event != null) {
+                this.eventId = eventId;
+                eventName.postValue(event.getTitle());
+                eventDate.postValue(event.getDate());
+            }
+        });
     }
 
     /**
@@ -105,47 +120,52 @@ public class EventDetailsViewModel extends AndroidViewModel{
 
         if (Objects.requireNonNull(eventName.getValue()).isEmpty()||
                 Objects.requireNonNull(eventDate.getValue()).isEmpty()){
-            errorMessage.setValue("Event name and date cannot be empty.");
+            errorMessage.postValue("Event name and date cannot be empty.");
             return;
         }
-        boolean result;
-
-        Event event;
-        if (eventId == -1){ // Create new event
-            result = repository.createEvent(eventName.getValue(), eventDate.getValue());
-            if (result){
-                int newId = repository.getLastEventId();
-                event = repository.getEvent(newId);
-            } else {
-                event = null;
-            }
-        }
-        else { // Update existing event
-            result = repository.updateEvent(eventId, eventName.getValue(), eventDate.getValue());
-            event = repository.getEvent(eventId);
-        }
-
-        if (result && event != null){ // Schedule notification for event
-            long eventTime = dateUtils.parseDateToMillis(event.getDate());
-            long currentTime = System.currentTimeMillis();
-            Log.d(TAG, "Event time: " + new Date(eventTime));
-            Log.d(TAG, "Current time: " + new Date(currentTime));
 
 
-            // If event time is in the future, schedule notification
-            if (eventTime > currentTime){
-                if (eventTime - currentTime > THIRTY_MINUTES) { // If event is more than 30 minutes away, schedule notification
-                    eventTime -= THIRTY_MINUTES;
-                    NotificationHelper.scheduleNotification(getApplication(), event, eventTime);
-                    Log.d(TAG, "Notification scheduled for event: " + event.getTitle() + " at " + new Date(eventTime));
-                }
-                else { // If event is less than 30 minutes away, schedule notification now
-                    NotificationHelper.scheduleNotification(getApplication(), event, currentTime);
-                    Log.d(TAG, "Notification scheduled for event: " + event.getTitle() + " at " + new Date(currentTime));
+        executor.execute(() -> {
+            Event event;
+            boolean result;
+            if (eventId == -1){ // Create new event
+                result = repository.createEvent(eventName.getValue(), eventDate.getValue());
+                if (result){
+                    int newId = repository.getLastEventId();
+                    event = repository.getEvent(newId);
+                } else {
+                    event = null;
                 }
             }
-        }
-        saveSuccess.setValue(result);
+            else { // Update existing event
+                result = repository.updateEvent(eventId, eventName.getValue(), eventDate.getValue());
+                event = repository.getEvent(eventId);
+            }
+
+            if (result && event != null){ // Schedule notification for event
+                long eventTime = dateUtils.parseDateToMillis(event.getDate());
+                long currentTime = System.currentTimeMillis();
+                Log.d(TAG, "Scheduling notification for event: " + event.getTitle());
+                Log.d(TAG, "    Event: " + new Date(eventTime));
+                Log.d(TAG, "    Current time: " + new Date(currentTime));
+
+
+                // If event time is in the future, schedule notification
+                if (eventTime > currentTime){
+                    if (eventTime - currentTime > THIRTY_MINUTES) { // If event is more than 30 minutes away, schedule notification
+                        eventTime -= THIRTY_MINUTES;
+                        NotificationHelper.scheduleNotification(getApplication(), event, eventTime);
+                        Log.d(TAG, "    Notification scheduled at " + new Date(eventTime));
+                    }
+                    else { // If event is less than 30 minutes away, schedule notification now
+                        NotificationHelper.scheduleNotification(getApplication(), event, currentTime);
+                        Log.d(TAG, "    Notification scheduled at " + new Date(currentTime));
+                    }
+                }
+            }
+            saveSuccess.postValue(result);
+            appStateHelper.setEventsModified(true);
+        });
     }
     
 

@@ -61,7 +61,6 @@ public class SettingsActivity extends AppCompatActivity {
             settingsViewModel.getMessage().observe(requireActivity(), message -> {
                 if (message != null && !message.isEmpty()) {
                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
-                    settingsViewModel.getMessage().setValue(null);
                 }
             });
 
@@ -143,7 +142,6 @@ public class SettingsActivity extends AppCompatActivity {
                             Intent intent = new Intent(requireContext(), DashboardActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
-                            Toast.makeText(requireContext(), "All events cleared", Toast.LENGTH_SHORT).show();
                         })
                         .setNegativeButton("Go Back", (dialog, which) -> {
                             // Simply dismiss the dialog

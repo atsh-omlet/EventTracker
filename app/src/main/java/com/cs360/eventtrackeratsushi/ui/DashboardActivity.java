@@ -1,9 +1,7 @@
 package com.cs360.eventtrackeratsushi.ui;
 
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,11 +19,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.R;
 import com.cs360.eventtrackeratsushi.adapter.EventAdapter;
+import com.cs360.eventtrackeratsushi.util.AppStateHelper;
 import com.cs360.eventtrackeratsushi.util.PermissionHelper;
 import com.cs360.eventtrackeratsushi.viewmodel.DashboardViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -45,6 +46,7 @@ public class DashboardActivity extends AppCompatActivity
     private EventAdapter eventAdapter;
 
     private DashboardViewModel dashboardViewModel;
+    private AppStateHelper appStateHelper;
 
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -68,6 +70,7 @@ public class DashboardActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_dashboard);
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
+        appStateHelper = AppStateHelper.getInstance(this);
 
         // set up toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -89,10 +92,24 @@ public class DashboardActivity extends AppCompatActivity
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         dashboardViewModel.getEvents().observe(this, events -> {
-            if (events != null){
-                eventAdapter.setEvents(events);
+            eventAdapter.setEvents(events);
+            TextView textNoEvents = findViewById(R.id.textNoEvents);
+            if (events == null || events.isEmpty()) {
+                textNoEvents.setVisibility(View.VISIBLE);
+            } else {
+                textNoEvents.setVisibility(View.GONE);
             }
         });
+
+        appStateHelper.getEventsModified().observe(
+                this, modified -> {
+                    if (modified) {
+                        Log.d(TAG, "Events modified, reloading events");
+                        dashboardViewModel.loadEvents();
+                        appStateHelper.setEventsModified(false);
+                    }
+                }
+        );
 
 
         // set up FAB
@@ -100,7 +117,6 @@ public class DashboardActivity extends AppCompatActivity
         fabAddEvent.setOnClickListener(view -> {
             Intent intent = new Intent(DashboardActivity.this, EventDetailsActivity.class);
             startActivity(intent);
-;
         });
 
         isInitialSetUpFlow = dashboardViewModel.shouldRequestInitialPermissions();
@@ -119,7 +135,18 @@ public class DashboardActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume called");
-        dashboardViewModel.loadEvents();
+        boolean isPastInitialSetup = !isInitialSetUpFlow;
+        Log.d(TAG, "isPastInitialSetup: " + isPastInitialSetup);
+        if (isPastInitialSetup && !dashboardViewModel.shouldOptOutReminder()) {
+            dashboardViewModel.checkExactAlarmPermission();
+            dashboardViewModel.getShouldShowExactAlarmGrantDialog().observe(this, show -> {
+                if (show) {
+                    showExactAlarmReGrantDialog();
+                    dashboardViewModel.setShouldShowExactAlarmGrantDialog(false);
+                }
+            });
+        }
+        /*
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             // only true when the app is not running for the first time
@@ -138,7 +165,7 @@ public class DashboardActivity extends AppCompatActivity
                 dashboardViewModel.rescheduleNotifications();
                 dashboardViewModel.setRescheduleNotifications(false);
             }
-        }
+        } */
     }
 
     /**
@@ -160,6 +187,7 @@ public class DashboardActivity extends AppCompatActivity
                 .setNegativeButton("Later", null)
                 .show();
     }
+
 
     @Override
     protected void onDestroy(){
@@ -239,21 +267,12 @@ public class DashboardActivity extends AppCompatActivity
         filterView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                String normalized = query.trim()
-                        .replaceAll("[^0-9/\\- ]", "")
-                        .replaceAll("[/ ]", "-")
-                        .replaceAll("-+$", "");
-
-                eventAdapter.filterEvents(normalized);
+                eventAdapter.filterEvents(query);
                 return true;
             }
             @Override
             public boolean onQueryTextChange(String newText) {
-                String normalized = newText.trim()
-                        .replaceAll("[^0-9/\\- ]", "")
-                        .replaceAll("[/ ]", "-")
-                        .replaceAll("-+$", "");
-                eventAdapter.filterEvents(normalized);
+                eventAdapter.filterEvents(newText);
                 return true;
             }
         });

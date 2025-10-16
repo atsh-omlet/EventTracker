@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat;
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.respository.EventRepository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -64,7 +65,8 @@ public class BootReceiver extends BroadcastReceiver {
             DateUtils dateUtils = new DateUtils();
 
             long currentTime = System.currentTimeMillis();
-            Log.d(TAG, "Current time: " + currentTime);
+            Log.d(TAG, "Rescheduling notifications for all events...");
+            Log.d(TAG, "Current time: " + new Date(currentTime));
 
             for (Event event : allEvents) {
                 long eventTimeMillis = dateUtils.parseDateToMillis(event.getDate());
@@ -80,9 +82,10 @@ public class BootReceiver extends BroadcastReceiver {
 
                     try {
                         NotificationHelper.scheduleNotification(context, event, notificationTime);
-                        Log.d(TAG, "Re-scheduled notification for event: " + event.getTitle());
+                        Log.d(TAG, "    Re-scheduled notification for event: " + event.getTitle()
+                                + " at " + new Date(notificationTime));
                     } catch (SecurityException e) {
-                        Log.e(TAG, "Failed to re-schedule notification for " + event.getTitle(), e);
+                        Log.e(TAG, "    Failed to re-schedule notification for " + event.getTitle(), e);
                     }
                 }
             }

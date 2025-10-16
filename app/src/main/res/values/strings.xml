@@ -17,4 +17,5 @@
     <string name="confirm">Confirm</string>
     <string name="filter">filter</string>
     <string name="update_password">Update Password</string>
+    <string name="no_events_yet">No events yet. Tap + to add one!</string>
 </resources>

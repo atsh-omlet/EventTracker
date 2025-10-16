@@ -1,6 +1,10 @@
 package com.cs360.eventtrackeratsushi.util;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Looper;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 /**
  * Helper class for managing persistent app state
@@ -16,6 +20,8 @@ public class AppStateHelper {
     private final String KEY_OPT_OUT_REMINDER = "opt_out_reminder";
     private final String KEY_WAS_GRANTED = "permission_was_granted";
     private final String KEY_RESCHEDULE = "reschedule_notifications";
+    private final MutableLiveData<Boolean> eventsModified = new MutableLiveData<>();
+
     public static AppStateHelper getInstance(Context context) {
         if (instance == null) {
             instance = new AppStateHelper(context);
@@ -31,6 +37,19 @@ public class AppStateHelper {
         String PREF_NAME = "AppStatePrefs";
         prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         editor = prefs.edit();
+    }
+
+    public LiveData<Boolean> getEventsModified() {
+        return eventsModified;
+    }
+
+    public void setEventsModified(boolean modified) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            eventsModified.setValue(modified);
+        } else {
+            eventsModified.postValue(modified);
+        }
+
     }
 
     /**

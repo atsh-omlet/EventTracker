@@ -13,6 +13,9 @@ import com.cs360.eventtrackeratsushi.respository.EventRepository;
 import com.cs360.eventtrackeratsushi.respository.UserRepository;
 import com.cs360.eventtrackeratsushi.util.NotificationHelper;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * ViewModel for LoginActivity and handles account related functions
  */
@@ -22,6 +25,7 @@ public class LoginViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> loginSuccess = new MutableLiveData<>();
     private final MutableLiveData<String> message = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoggedIn = new MutableLiveData<>();
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     /**
      * Constructor for LoginViewModel
@@ -64,18 +68,21 @@ public class LoginViewModel extends AndroidViewModel {
      */
     public void login(String username, String password) {
         if (username.isEmpty() || password.isEmpty()) {
-            message.setValue("Please enter both a username and password.");
+            message.postValue("Please enter both a username and password.");
             return;
         }
-        if (repository.login(username, password)) {
-            loginSuccess.setValue(true);
-            isLoggedIn.setValue(repository.isLoggedIn());
-            message.setValue("Welcome back, " + username + ".");
-            Log.d(TAG, "login: " + repository.isLoggedIn());
-        }
-        else {
-            message.setValue("Invalid username or password. Please try again.");
-        }
+        executor.execute(() -> {
+            if (repository.login(username, password)) {
+                loginSuccess.postValue(true);
+                isLoggedIn.postValue(repository.isLoggedIn());
+                message.postValue("Welcome back, " + username + ".");
+                Log.d(TAG, "login: " + repository.isLoggedIn());
+                Log.d(TAG, "username: " + repository.getUsername()
+                    + ", userId: " + repository.getUserId());
+            } else {
+                message.postValue("Invalid username or password. Please try again.");
+            }
+        });
     }
 
     /**
@@ -89,19 +96,23 @@ public class LoginViewModel extends AndroidViewModel {
             message.setValue("Please enter a username and fill both password fields.");
             return;
         }
-        else if (repository.checkUsername(username)){
-            message.setValue("Username taken, please login.");
-            return;
-        }
+        executor.execute(() -> {
+            if (repository.checkUsername(username)) {
+                message.postValue("Username taken, please login.");
+                return;
+            }
 
-        if (repository.createUser(username, password, passwordConfirm)) {
-            loginSuccess.setValue(true);
-            message.setValue("Account created. Welcome, " + username + ".");
-            isLoggedIn.setValue(repository.isLoggedIn());
-        }
-        else {
-            message.setValue("Passwords do not match. Please try again.");
-        }
+            if (repository.createUser(username, password, passwordConfirm)) {
+                loginSuccess.postValue(true);
+                message.postValue("Account created. Welcome, " + username + ".");
+                isLoggedIn.postValue(repository.isLoggedIn());
+                Log.d(TAG, "createUser: " + repository.isLoggedIn());
+                Log.d(TAG, "username: " + repository.getUsername() + ", userId: "
+                        + repository.getUserId());
+            } else {
+                message.postValue("Passwords do not match. Please try again.");
+            }
+        });
     }
 
 

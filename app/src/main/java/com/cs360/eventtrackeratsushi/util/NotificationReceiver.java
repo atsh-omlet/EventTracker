@@ -6,6 +6,8 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 
 
 import androidx.core.app.NotificationCompat;
@@ -57,10 +59,23 @@ public class NotificationReceiver extends BroadcastReceiver {
         SessionManager sessionManager = SessionManager.getInstance(context);
         String userName = sessionManager.getUsername();
 
+
+        // Style the notification text to make the title and date bold
+        String message = "Your event " + title + " is starting soon at " + date + "!";
+        SpannableString styledText = new SpannableString(message);
+        assert title != null;
+        int titleStart = message.indexOf(title);
+        int titleEnd = titleStart + title.length();
+        styledText.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), titleStart, titleEnd, 0);
+        assert date != null;
+        int dateStart = message.indexOf(date);
+        int dateEnd = dateStart + date.length();
+        styledText.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), dateStart, dateEnd, 0);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle("Upcoming Event for " + userName)
-                .setContentText("Your event \"" + title + "\" is starting soon at " + date + "!")
+                .setContentText(styledText)
                 .setContentIntent(contentIntent)
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)

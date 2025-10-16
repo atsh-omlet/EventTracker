@@ -2,16 +2,20 @@ package com.cs360.eventtrackeratsushi.viewmodel;
 
 import android.app.Application;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.cs360.eventtrackeratsushi.model.Event;
 import com.cs360.eventtrackeratsushi.respository.EventRepository;
 import com.cs360.eventtrackeratsushi.respository.UserRepository;
+import com.cs360.eventtrackeratsushi.util.AppStateHelper;
 import com.cs360.eventtrackeratsushi.util.NotificationHelper;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Consolidated ViewModel for SettingsActivity to handle cross-cutting account/event logic.
@@ -23,26 +27,36 @@ public class SettingsViewModel extends AndroidViewModel {
     private final EventRepository eventRepository;
     private final MutableLiveData<String> message = new MutableLiveData<>();
     private final MutableLiveData<Boolean> passwordCheck = new MutableLiveData<>();
+    private final AppStateHelper appStateHelper;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public SettingsViewModel(@NonNull Application application) {
         super(application);
         this.userRepository = UserRepository.getInstance(application);
         this.eventRepository = EventRepository.getInstance(application);
+        this.appStateHelper = AppStateHelper.getInstance(application);
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        executor.shutdown();
     }
 
     /**
      * Gets the message LiveData
      * @return  The message LiveData
      */
-    public MutableLiveData<String> getMessage() {
+    public LiveData<String> getMessage() {
         return message;
     }
+
 
     /**
      * Gets the passwordCheck LiveData
      * @return  The passwordCheck LiveData
      */
-    public MutableLiveData<Boolean> getPasswordCheck() {
+    public LiveData<Boolean> getPasswordCheck() {
         return passwordCheck;
     }
 
@@ -52,7 +66,7 @@ public class SettingsViewModel extends AndroidViewModel {
     public void logout() {
         String username = userRepository.getUsername();
         userRepository.logout();
-        message.setValue("Logged out of " + username + ".");
+        message.postValue("Logged out of " + username + ".");
     }
 
     /**
@@ -64,7 +78,11 @@ public class SettingsViewModel extends AndroidViewModel {
         for (Event event : events){
             NotificationHelper.cancelNotification(getApplication(), event.getId());
         }
-        eventRepository.deleteAllEvents();
+        executor.execute(() -> {
+            eventRepository.deleteAllEvents();
+            appStateHelper.setEventsModified(true);
+            message.postValue("All events cleared.");
+        });
 
     }
 
@@ -73,27 +91,31 @@ public class SettingsViewModel extends AndroidViewModel {
      */
     public void deleteAccount(String password){
         if (password.isEmpty()){
-            message.setValue("Please enter a password.");
+            message.postValue("Please enter a password.");
             return;
         }else if (!userRepository.checkPassword(password)) {
-            message.setValue("Invalid password. Please try again.");
+            message.postValue("Invalid password. Please try again.");
             return;
         }
         try {
-            Event[] events = new Event[eventRepository.getEventsForUser().size()];
-            events = eventRepository.getEventsForUser().toArray(events);
+            Event[] events = eventRepository.getEventsForUser().toArray(new Event[0]);
             for (Event event : events){
                 NotificationHelper.cancelNotification(getApplication(), event.getId());
             }
-            if (userRepository.deleteUser()){
-                String username = userRepository.getUsername();
-                userRepository.logout();
-                message.setValue("Account deleted.\nGoodbye, " + username + ".");
-                passwordCheck.setValue(true);
-            }
+            executor.execute(() -> {
+                if (userRepository.deleteUser()){
+                    String username = userRepository.getUsername();
+                    int userId = userRepository.getUserId();
+                    userRepository.logout();
+                    message.postValue("Account deleted.\nGoodbye, " + username + ".");
+                    Log.d(TAG, "Account deleted. userId: "
+                            + userId + ", username: " + username + ".");
+                    passwordCheck.postValue(true);
+                }
+            });
         } catch (Exception e){
-            message.setValue("Error deleting account. Please try again.");
-            Log.d(TAG, "deleteAccount: " + e.getMessage());
+            message.postValue("Error deleting account. Please try again.");
+            Log.e(TAG, "deleteAccount: " + e.getMessage());
         }
     }
 
@@ -102,14 +124,14 @@ public class SettingsViewModel extends AndroidViewModel {
      */
     public void checkPassword(String password){
         if (password.isEmpty()){
-            message.setValue("Please enter a password.");
+            message.postValue("Please enter a password.");
             return;
         }
         if (userRepository.checkPassword(password)){
-            passwordCheck.setValue(true);
+            passwordCheck.postValue(true);
         }
         else {
-            message.setValue("Invalid password. Please try again.");
+            message.postValue("Invalid password. Please try again.");
         }
     }
 
@@ -120,19 +142,21 @@ public class SettingsViewModel extends AndroidViewModel {
      */
     public void updatePassword(String newPassword, String confirmPassword) {
         if (newPassword.isEmpty() || confirmPassword.isEmpty()) {
-            message.setValue("Please enter a new password and confirm it.");
+            message.postValue("Please enter a new password and confirm it.");
             return;
         } else if (!newPassword.equals(confirmPassword)) {
-            message.setValue("Passwords do not match. Please try again.");
+            message.postValue("Passwords do not match. Please try again.");
             return;
         }
         try {
-            if (userRepository.updatePassword(newPassword)) {
-                message.setValue("Password updated successfully.");
-                passwordCheck.setValue(true);
-            }
+            executor.execute(() -> {
+                if (userRepository.updatePassword(newPassword)) {
+                    message.postValue("Password updated successfully.");
+                    passwordCheck.postValue(true);
+                }
+            });
         } catch (Exception e) {
-            message.setValue("Error updating password. Please try again.");
+            message.postValue("Error updating password. Please try again.");
             Log.d(TAG, "updatePassword: " + e.getMessage());
         }
     }
