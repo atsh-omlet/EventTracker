@@ -9,7 +9,6 @@ import java.util.ArrayList;
 public class EventRepository {
     private final DatabaseHelper dbHelper;
     private final SessionManager sessionManager;
-    private final int userId;
 
     private static EventRepository instance;
     public static EventRepository getInstance(Context context){
@@ -22,7 +21,7 @@ public class EventRepository {
     private EventRepository(Context context){
         dbHelper = DatabaseHelper.getInstance(context);
         sessionManager = new SessionManager(context);
-        userId = sessionManager.getUserId();
+
     }
 
     public String getUsername(){
@@ -37,7 +36,7 @@ public class EventRepository {
      * @return true if succesful, false if not
      */
     public boolean createEvent(String title, String date) {
-        return dbHelper.createEvent(title, date, userId);
+        return dbHelper.createEvent(title, date, sessionManager.getUserId());
     }
 
     /**
@@ -70,7 +69,7 @@ public class EventRepository {
      * @return all events associated with a userId, ordered by ascending datae
      */
     public ArrayList<Event> getEventsForUser() {
-        return dbHelper.getEventsForUser(userId);
+        return dbHelper.getEventsForUser(sessionManager.getUserId());
     }
 
 }
