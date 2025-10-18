@@ -1,4 +1,4 @@
-package com.atsushi.event_tracker.util;
+package com.atsushi.event_tracker.manager;
 import android.content.Context;
 import android.content.SharedPreferences;
 

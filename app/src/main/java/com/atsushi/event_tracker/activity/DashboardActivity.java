@@ -1,4 +1,4 @@
-package com.atsushi.event_tracker.ui;
+package com.atsushi.event_tracker.activity;
 
 
 import android.app.AlertDialog;
@@ -26,8 +26,8 @@ import android.widget.Toast;
 import com.atsushi.event_tracker.model.Event;
 import com.atsushi.event_tracker.R;
 import com.atsushi.event_tracker.adapter.EventAdapter;
-import com.atsushi.event_tracker.util.AppStateHelper;
-import com.atsushi.event_tracker.util.PermissionHelper;
+import com.atsushi.event_tracker.manager.AppStateHelper;
+import com.atsushi.event_tracker.permission.PermissionHelper;
 import com.atsushi.event_tracker.viewmodel.DashboardViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.Objects;
@@ -145,9 +145,9 @@ public class DashboardActivity extends AppCompatActivity
         dashboardViewModel.autoUpdatePermissionGranted();
         dashboardViewModel.rescheduleTrigger();
         boolean isPastInitialSetup = !isInitialSetUpFlow;
-        Log.d(TAG, "isPastInitialSetup: " + isPastInitialSetup);
-        Log.d(TAG, "shouldOptOutReminder: " + dashboardViewModel.shouldOptOutReminder());
-        Log.d(TAG, "wasPermissionGranted: " + dashboardViewModel.wasPermissionGranted());
+        Log.d(TAG, "    isPastInitialSetup: " + isPastInitialSetup);
+        Log.d(TAG, "    shouldOptOutReminder: " + dashboardViewModel.shouldOptOutReminder());
+        Log.d(TAG, "    wasPermissionGranted: " + dashboardViewModel.wasPermissionGranted());
         if (isPastInitialSetup && !dashboardViewModel.shouldOptOutReminder()) {
             dashboardViewModel.checkExactAlarmPermission();
             dashboardViewModel.getShouldShowExactAlarmGrantDialog().observe(this, show -> {

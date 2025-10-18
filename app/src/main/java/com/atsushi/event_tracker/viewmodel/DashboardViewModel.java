@@ -14,9 +14,9 @@ import androidx.lifecycle.AndroidViewModel;
 
 import com.atsushi.event_tracker.model.Event;
 import com.atsushi.event_tracker.respository.EventRepository;
-import com.atsushi.event_tracker.util.AppStateHelper;
+import com.atsushi.event_tracker.manager.AppStateHelper;
 import com.atsushi.event_tracker.util.DateUtils;
-import com.atsushi.event_tracker.util.NotificationHelper;
+import com.atsushi.event_tracker.notification.NotificationHelper;
 
 import java.util.Date;
 import java.util.List;
@@ -226,14 +226,13 @@ public class DashboardViewModel extends AndroidViewModel{
         executor.execute(() -> {
             EventRepository repository = EventRepository.getInstance(getApplication());
             List<Event> allEvents = repository.getEventsForUser();
-            DateUtils dateUtils = new DateUtils();
 
             long currentTime = System.currentTimeMillis();
             Log.d(TAG, "Rescheduling notifications for all events...");
             Log.d(TAG, "Current time: " + new Date(currentTime));
 
             for (Event event : allEvents) {
-                long eventTimeMillis = dateUtils.parseDateToMillis(event.getDate());
+                long eventTimeMillis = DateUtils.parseDateToMillis(event.getDate());
 
                 // Only re-schedule notifications for events that are in the future
                 if (eventTimeMillis > currentTime) {
@@ -246,10 +245,10 @@ public class DashboardViewModel extends AndroidViewModel{
 
                     try {
                         NotificationHelper.scheduleNotification(getApplication(), event, notificationTime);
-                        Log.d(TAG, "    Re-scheduled notification for event: " + event.getTitle()
+                        Log.d(TAG, "Re-scheduled notification for event: " + event.getTitle()
                             + " at " + new Date(notificationTime));
                     } catch (SecurityException e) {
-                        Log.e(TAG, "    Failed to re-schedule notification for " + event.getTitle(), e);
+                        Log.e(TAG, "Failed to re-schedule notification for " + event.getTitle(), e);
                     }
                 }
             }
@@ -270,23 +269,22 @@ public class DashboardViewModel extends AndroidViewModel{
     }
 
     public void checkExactAlarmPermission(){
-        Log.d(TAG, "checkExactAlarmPermission: ");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (alarmManager == null) {
-                Log.d(TAG, "    checkExactAlarmPermission: alarmManager is null");
+                Log.d(TAG, "checkExactAlarmPermission: alarmManager is null");
                 return;
             }
             if (!wasPermissionGranted()){
-                Log.d(TAG, "    checkExactAlarmPermission: wasPermissionGranted is false");
+                Log.d(TAG, "checkExactAlarmPermission: wasPermissionGranted is false");
                 return;
             }
             if (!alarmManager.canScheduleExactAlarms()) {
-                Log.d(TAG, "    checkExactAlarmPermission: Exact alarm permission denied");
-                Log.d(TAG, "    shouldOptOutReminder: " + shouldOptOutReminder());
+                Log.d(TAG, "checkExactAlarmPermission: Exact alarm permission denied");
+                Log.d(TAG, "shouldOptOutReminder: " + shouldOptOutReminder());
                 setShouldShowExactAlarmGrantDialog(true);
                 return;
             }
-            Log.d(TAG, "    checkExactAlarmPermission: Exact alarm permission granted");
+            Log.d(TAG, "checkExactAlarmPermission: Exact alarm permission granted");
         }
     }
 

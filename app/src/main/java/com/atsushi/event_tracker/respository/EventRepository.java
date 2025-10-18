@@ -2,7 +2,7 @@ package com.atsushi.event_tracker.respository;
 import android.content.Context;
 import com.atsushi.event_tracker.database.DatabaseHelper;
 import com.atsushi.event_tracker.model.Event;
-import com.atsushi.event_tracker.util.SessionManager;
+import com.atsushi.event_tracker.manager.SessionManager;
 
 import java.util.ArrayList;
 

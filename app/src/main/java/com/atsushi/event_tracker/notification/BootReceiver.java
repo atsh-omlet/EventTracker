@@ -1,4 +1,4 @@
-package com.atsushi.event_tracker.util;
+package com.atsushi.event_tracker.notification;
 
 import android.Manifest;
 import android.app.AlarmManager;
@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat;
 
 import com.atsushi.event_tracker.model.Event;
 import com.atsushi.event_tracker.respository.EventRepository;
+import com.atsushi.event_tracker.util.DateUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -62,14 +63,13 @@ public class BootReceiver extends BroadcastReceiver {
         executor.execute(() -> {
             EventRepository repository = EventRepository.getInstance(context.getApplicationContext());
             List<Event> allEvents = repository.getEventsForUser();
-            DateUtils dateUtils = new DateUtils();
 
             long currentTime = System.currentTimeMillis();
             Log.d(TAG, "Rescheduling notifications for all events...");
             Log.d(TAG, "Current time: " + new Date(currentTime));
 
             for (Event event : allEvents) {
-                long eventTimeMillis = dateUtils.parseDateToMillis(event.getDate());
+                long eventTimeMillis = DateUtils.parseDateToMillis(event.getDate());
 
                 // Only re-schedule notifications for events that are in the future
                 if (eventTimeMillis > currentTime) {

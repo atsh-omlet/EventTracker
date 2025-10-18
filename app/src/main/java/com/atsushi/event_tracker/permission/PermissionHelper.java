@@ -1,4 +1,4 @@
-package com.atsushi.event_tracker.util;
+package com.atsushi.event_tracker.permission;
 
 import android.Manifest;
 import android.app.AlarmManager;
@@ -32,7 +32,7 @@ public class PermissionHelper {
 
     /**
      *  checks if permissions have been granted
-     * @param context
+     * @param context context
      */
     public static void requestExactAlarmSettings(Context context){
 

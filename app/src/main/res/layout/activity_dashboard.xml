@@ -6,7 +6,7 @@
     android:id="@+id/dashboardLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.DashboardActivity">
+    tools:context=".activity.DashboardActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"

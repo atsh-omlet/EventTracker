@@ -1,4 +1,4 @@
-package com.atsushi.event_tracker.ui;
+package com.atsushi.event_tracker.activity;
 
 import android.os.Bundle;
 import android.widget.Button;

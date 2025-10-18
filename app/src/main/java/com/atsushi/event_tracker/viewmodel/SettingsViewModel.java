@@ -11,8 +11,8 @@ import androidx.lifecycle.MutableLiveData;
 import com.atsushi.event_tracker.model.Event;
 import com.atsushi.event_tracker.respository.EventRepository;
 import com.atsushi.event_tracker.respository.UserRepository;
-import com.atsushi.event_tracker.util.AppStateHelper;
-import com.atsushi.event_tracker.util.NotificationHelper;
+import com.atsushi.event_tracker.manager.AppStateHelper;
+import com.atsushi.event_tracker.notification.NotificationHelper;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

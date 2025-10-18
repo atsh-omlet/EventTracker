@@ -28,7 +28,6 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private final List<Object> displayedItems = new ArrayList<>();
     private final OnDeleteClickListener deleteListener;
     private final OnItemLongClickListener longClickListener;
-    private final DateUtils dateUtils = new DateUtils();
 
     /**
      * interface for callback when event's delete button is pressed
@@ -46,8 +45,8 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     /**
      *  Constructor for EventAdapter
-     * @param deleteListener
-     * @param longClickListener
+     * @param deleteListener  Listener for delete button click
+     * @param longClickListener Listener for long click
      */
     public EventAdapter(OnDeleteClickListener deleteListener,
                         OnItemLongClickListener longClickListener) {
@@ -68,7 +67,7 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
      * @param parent   The ViewGroup into which the new View will be added after it is bound to
      *                 an adapter position.
      * @param viewType The view type of the new View.
-     * @return
+     * @return A new ViewHolder that holds a View of the given view type.
      */
     @NonNull
     @Override
@@ -97,7 +96,7 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             EventViewHolder eventHolder = (EventViewHolder) holder;
 
             eventHolder.eventName.setText(event.getTitle());
-            eventHolder.eventDate.setText(dateUtils.formatTime(event.getDate()));
+            eventHolder.eventDate.setText(DateUtils.formatTime(event.getDate()));
 
             // Delete button click
             eventHolder.btnDelete.setOnClickListener(v -> {
@@ -139,8 +138,8 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         String normalized = text.trim().toLowerCase();
         if (normalized.isEmpty()||text.length()<2){
             rebuildDisplayedItems(events);
-        }
-        else {
+        } else {
+            Log.d(TAG, "Searching events for normalized text: " + normalized);
             for (Event event : events){
                 if (event.getTitle().toLowerCase().contains(normalized)){
                     filteredList.add(event);
@@ -166,8 +165,9 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             rebuildDisplayedItems(events);
             return;
         }
+        Log.d(TAG, "Filtering events for normalized date: " + normalized);
         for (Event event : events){
-            if (dateUtils.formatDate(event.getDate()).startsWith(date)){
+            if (DateUtils.formatDate(event.getDate()).startsWith(normalized)){
                 filteredList.add(event);
             }
         }
@@ -197,21 +197,26 @@ public class EventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public void rebuildDisplayedItems(List<Event> events){
         String lastDate = null;
+        Log.d(TAG, "Rebuilding displayed items...");
+        int i = 0;
         for (Event event: events){
-            String eventDate = dateUtils.formatWeekday(event.getDate());
+            String eventDate = DateUtils.formatWeekday(event.getDate());
             if (!eventDate.equals(lastDate)){
-                Log.d(TAG, "eventDate: " + eventDate);
-                Log.d(TAG, "lastDate: " + lastDate);
-                Log.d(TAG, "Adding header for eventDate: " + eventDate);
-                if (dateUtils.isToday(event.getDate())) {
+                Log.d(TAG, "    eventDate: " + eventDate);
+                Log.d(TAG, "    lastDate: " + lastDate);
+                Log.d(TAG, "    Adding header for eventDate: " + eventDate);
+                if (DateUtils.isToday(event.getDate())) {
                     displayedItems.add(eventDate+ " (Today)");
                 } else {
                     displayedItems.add(eventDate);
+
                 }
                 lastDate = eventDate;
             }
+            i++;
             displayedItems.add(event);
         }
+        Log.d(TAG, "Rebuilt " + i + " items.");
         notifyDataSetChanged();
     }
 

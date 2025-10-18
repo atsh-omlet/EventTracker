@@ -15,7 +15,7 @@ public class DateUtils {
      * @param date  The date to format
      * @return  The formatted time string
      */
-    public String formatTime(String date) {
+    public static String formatTime(String date) {
         try {
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
             Date parsedDate = inputFormat.parse(date);
@@ -34,7 +34,7 @@ public class DateUtils {
      * @param date  The date to format
      * @return  The formatted date string
      */
-    public String formatDate(String date){
+    public static String formatDate(String date){
         try {
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
             Date parsedDate = inputFormat.parse(date);
@@ -53,7 +53,7 @@ public class DateUtils {
      * @param date  The date to format
      * @return  The formatted date string
      */
-    public String formatWeekday(String date) {
+    public static String formatWeekday(String date) {
         try {
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
 
@@ -76,7 +76,7 @@ public class DateUtils {
         }
     }
 
-    public long parseDateToMillis(String dateString) {
+    public static long parseDateToMillis(String dateString) {
         try {
             java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
                     "yyyy-MM-dd HH:mm", java.util.Locale.getDefault());
@@ -89,7 +89,7 @@ public class DateUtils {
         }
     }
 
-    public boolean isToday(String date) {
+    public static boolean isToday(String date) {
         try {
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
 

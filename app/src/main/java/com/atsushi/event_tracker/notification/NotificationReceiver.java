@@ -1,4 +1,4 @@
-package com.atsushi.event_tracker.util;
+package com.atsushi.event_tracker.notification;
 
 import android.app.NotificationChannel;
 import android.app.PendingIntent;
@@ -13,7 +13,8 @@ import android.text.style.StyleSpan;
 import androidx.core.app.NotificationCompat;
 
 import com.atsushi.event_tracker.R;
-import com.atsushi.event_tracker.ui.MainActivity;
+import com.atsushi.event_tracker.activity.MainActivity;
+import com.atsushi.event_tracker.manager.SessionManager;
 
 /**
  * Broadcast receiver for handling notifications

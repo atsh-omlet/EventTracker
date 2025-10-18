@@ -1,4 +1,4 @@
-package com.atsushi.event_tracker.ui;
+package com.atsushi.event_tracker.activity;
 
 import android.content.Intent;
 import android.os.Bundle;

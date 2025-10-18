@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.atsushi.event_tracker.database.DatabaseHelper;
 import com.atsushi.event_tracker.util.SecurityUtils;
-import com.atsushi.event_tracker.util.SessionManager;
+import com.atsushi.event_tracker.manager.SessionManager;
 
 /**
  * Repository for user operations

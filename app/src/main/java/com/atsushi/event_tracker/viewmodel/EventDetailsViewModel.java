@@ -10,9 +10,9 @@ import androidx.lifecycle.AndroidViewModel;
 
 import com.atsushi.event_tracker.model.Event;
 import com.atsushi.event_tracker.respository.EventRepository;
-import com.atsushi.event_tracker.util.AppStateHelper;
+import com.atsushi.event_tracker.manager.AppStateHelper;
 import com.atsushi.event_tracker.util.DateUtils;
-import com.atsushi.event_tracker.util.NotificationHelper;
+import com.atsushi.event_tracker.notification.NotificationHelper;
 
 import java.util.Date;
 import java.util.Objects;
@@ -28,7 +28,6 @@ public class EventDetailsViewModel extends AndroidViewModel{
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final AppStateHelper appStateHelper = AppStateHelper.getInstance(getApplication());
-    private final DateUtils dateUtils = new DateUtils();
 
     private int eventId = -1;
     private final int THIRTY_MINUTES = 60000 * 30;
@@ -126,6 +125,7 @@ public class EventDetailsViewModel extends AndroidViewModel{
 
 
         executor.execute(() -> {
+            Log.d(TAG, "saveEvent: Saving event...");
             Event event;
             boolean result;
             if (eventId == -1){ // Create new event
@@ -143,7 +143,7 @@ public class EventDetailsViewModel extends AndroidViewModel{
             }
 
             if (result && event != null){ // Schedule notification for event
-                long eventTime = dateUtils.parseDateToMillis(event.getDate());
+                long eventTime = DateUtils.parseDateToMillis(event.getDate());
                 long currentTime = System.currentTimeMillis();
                 Log.d(TAG, "Scheduling notification for event: " + event.getTitle());
                 Log.d(TAG, "    Event: " + new Date(eventTime));
@@ -161,6 +161,8 @@ public class EventDetailsViewModel extends AndroidViewModel{
                         NotificationHelper.scheduleNotification(getApplication(), event, currentTime);
                         Log.d(TAG, "    Notification scheduled at " + new Date(currentTime));
                     }
+                } else {
+                    Log.d(TAG, "    Event time is in the past. Notification not scheduled.");
                 }
             }
             saveSuccess.postValue(result);

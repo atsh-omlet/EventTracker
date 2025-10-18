@@ -1,4 +1,4 @@
-package com.atsushi.event_tracker.util;
+package com.atsushi.event_tracker.notification;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -9,6 +9,7 @@ import android.os.Build;
 import android.util.Log;
 
 import com.atsushi.event_tracker.model.Event;
+import com.atsushi.event_tracker.util.DateUtils;
 
 import java.util.Date;
 
@@ -21,7 +22,6 @@ public class NotificationHelper {
 
     //@RequiresPermission(Manifest.permission.SCHEDULE_EXACT_ALARM)
     public static void scheduleNotification(Context context, Event event, long notificationTime) {
-        DateUtils dateUtils = new DateUtils();
 
         Log.d(TAG, "Scheduling notification for event: " + event.getTitle());
         Log.d(TAG, "Notification time: " + new Date(notificationTime));
@@ -46,7 +46,7 @@ public class NotificationHelper {
         intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
         intent.putExtra("title", event.getTitle());
         intent.putExtra("eventId", event.getId());
-        intent.putExtra("eventDate", dateUtils.formatTime(event.getDate()));
+        intent.putExtra("eventDate", DateUtils.formatTime(event.getDate()));
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
