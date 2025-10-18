@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.cs360.eventtrackeratsushi"
+    namespace = "com.atsushi.event_tracker"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.cs360.eventtrackeratsushi"
+        applicationId = "com.atsushi.event_tracker"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
