@@ -29,5 +29,5 @@ enforcing separation of concerns and improving maintainability.
 ## Database
 Originally implemented with SQLite, the data layer has been migrated to MongoDB Realm to adopt an object-oriented data model.
 
-## Author
+### Author
 Atsushi
