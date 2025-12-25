@@ -1,8 +1,8 @@
 # Event Tracker Android App
 
 ## Overview
-This application is designed to allow users to create and manage events. It was originally developed as a university project and has been iteratively enhanced, resulting in improved 
-architecture, database design, and additional features.
+This application is designed to allow users to create and manage events. It was originally developed as a university project and has been iteratively enhanced to improve 
+architecture and database design, and add additional features.
 
 ## Features
 - User authentication (login details hashed using BCrypt)
